@@ -1,0 +1,679 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0E1215"><meta name="description" content="Programa a tu nivel, una app que te dice qué levantar cada día y un coach que revisa tu semana."><meta property="og:title" content="MODO · Entrena con números"><meta property="og:description" content="Programa a tu nivel, una app que te dice qué levantar cada día y un coach que revisa tu semana."><meta property="og:image" content="https://dalifpibarra-png.github.io/modo/img/og.jpg"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon-192.png"><link rel="apple-touch-icon" href="./icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MODO"><style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>MODO con Dalí</title>
+<meta name="description" content="Coaching de fuerza a distancia: programa a tu nivel, una app que registra cada serie y revisión cada semana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;600;700&display=swap">
+<script>(function(){var d=document.documentElement,R=false,p=null;try{R=matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}try{p=localStorage.getItem("anim")}catch(e){}var lo=(navigator.hardwareConcurrency||8)<=4||(navigator.deviceMemory||8)<=4;window.__lowfx=lo;if(lo)d.classList.add("lowfx");window.__osReduce=R;window.__motion=p==="full"?"full":p==="off"?"off":(R?"soft":"full");d.classList.add("mo-"+window.__motion);window.__errs=[];addEventListener("error",function(e){window.__errs.push((e.message||("no cargó: "+((e.target&&(e.target.src||e.target.href))||"?"))))},true)})();</script>
+<style>
+/* MODO · página de captación (15 oct 2026)
+   Lectura: landing de coaching de fuerza a distancia para gente de 20 a 35 en
+   Guadalajara que entrena sin ver cambios; lenguaje cercano y directo; estética
+   de instrumento deportivo (placas olímpicas, gis y piso de hule).
+   Palanca: transformación visible + prueba con números reales + primer paso chico
+   (probar la app y saber tu nivel, gratis). Diales: VAR 7 · MOV 6 · DEN 4.
+   Layout: actos alternados; tres actos oscuros con razón (hero, prueba, cierre). */
+:root{
+  color-scheme: light;
+  --bg:#EEF1F0; --card:#FFFFFF; --sunk:#E2E8E6; --ink:#121920; --ink2:#435059; --ink3:#6C7983; --line:#D1D9D8;
+  --floor:#101519; --floor2:#182027; --on-floor:#EAF0F2; --on-floor2:#A9B6BF;
+  --acc:#1F4FD8; --acc-ink:#FFFFFF; --acc-w:#E2E9FB;
+  --p25:#C8352B; --p20:#1F4FD8; --p15:#E2B33C; --p10:#1C7A46; --p5:#F3F5F4;
+  --ok:#1C7343; --warn:#9A6410;
+  --display:"Archivo","Arial Narrow",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --data:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:22px; --pill:999px;
+  --shadow:0 1px 1px rgba(18,25,32,.05),0 18px 40px -26px rgba(18,25,32,.45);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme: dark;
+    --bg:#0E1316; --card:#161D22; --sunk:#1D252B; --ink:#E8EEF0; --ink2:#AAB6BE; --ink3:#7E8B94; --line:#28323A;
+    --floor:#080B0D; --floor2:#11171B; --acc:#7C9DF5; --acc-ink:#0E1316; --acc-w:#18233F; --p20:#5B82F0; --p5:#DDE3E6; --ok:#6FCB94; --warn:#E9B957;
+    --shadow:0 1px 1px rgba(0,0,0,.3),0 18px 40px -26px rgba(0,0,0,.9); }
+}
+:root[data-theme="dark"]{ color-scheme: dark;
+  --bg:#0E1316; --card:#161D22; --sunk:#1D252B; --ink:#E8EEF0; --ink2:#AAB6BE; --ink3:#7E8B94; --line:#28323A;
+  --floor:#080B0D; --floor2:#11171B; --acc:#7C9DF5; --acc-ink:#0E1316; --acc-w:#18233F; --p20:#5B82F0; --p5:#DDE3E6; --ok:#6FCB94; --warn:#E9B957;
+  --shadow:0 1px 1px rgba(0,0,0,.3),0 18px 40px -26px rgba(0,0,0,.9); }
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+.mo-soft,.mo-off{scroll-behavior:auto}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);overflow-x:clip}
+h1,h2,h3,p,ul,ol,figure{margin:0} ul,ol{padding:0;list-style:none}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:where(a,button,input,select,summary):focus-visible{outline:3px solid var(--acc);outline-offset:3px;border-radius:8px}
+.in{max-width:1180px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;letter-spacing:-.02em}
+.h2{font:850 clamp(2rem,5.4vw,3.4rem)/1.02 var(--display);font-stretch:112%}
+.lead{font-size:1.08rem;color:var(--ink2);max-width:60ch}
+.mono{font-family:var(--data);font-variant-numeric:tabular-nums}
+section{padding-block:clamp(64px,10vw,120px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:var(--pill);font:800 1rem/1 var(--display);text-decoration:none;cursor:pointer;border:2px solid transparent;transition:transform .15s,background .2s,border-color .2s;white-space:nowrap}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn.go{background:var(--acc);color:var(--acc-ink)}
+.btn.go:hover{filter:brightness(1.08)}
+.btn.line{border-color:currentColor;background:transparent}
+.btn.wa{background:#1E8E4E;color:#fff}
+
+/* ── nav ── */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--floor) 92%,transparent);color:var(--on-floor);backdrop-filter:blur(10px)}
+.lowfx .nav{backdrop-filter:none;background:var(--floor)}
+.nav .in{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px}
+.logo{font:900 1.25rem/1 var(--display);font-stretch:122%;letter-spacing:.06em;text-decoration:none}
+.logo em{font-style:normal;color:var(--p15)}
+.nav .btn{min-height:42px;padding:0 16px;font-size:.88rem}
+
+/* ── hero (acto oscuro 1: el piso del gym) ── */
+.hero{background:radial-gradient(120% 80% at 80% 10%,var(--floor2),var(--floor) 70%);color:var(--on-floor);padding-block:clamp(36px,6vw,72px) clamp(48px,7vw,88px);overflow:hidden;position:relative}
+.hero .in{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,5vw,64px);align-items:center}
+.hero h1{font:900 clamp(3rem,10.5vw,6.6rem)/.9 var(--display);font-stretch:118%;letter-spacing:-.035em}
+@media(min-width:821px){.hero .in{grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr)}.hero h1{font-size:clamp(3rem,5.6vw,4.6rem);font-stretch:106%;line-height:.95}}
+.hero h1 em{font-style:normal;color:var(--p15)}
+.hero p{font-size:clamp(1.05rem,2.2vw,1.25rem);color:var(--on-floor2);max-width:34ch;margin-top:20px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.hero .btn.line{color:var(--on-floor)}
+.escena{position:relative;display:grid;place-items:center;min-height:420px}
+.telefono{width:min(280px,72vw);aspect-ratio:560/1211;border-radius:38px;padding:10px;background:#0B0F12;box-shadow:0 0 0 2px #2A333A,0 40px 80px -30px rgba(0,0,0,.9);position:relative;z-index:2;transform:rotate(-4deg)}
+.telefono img{position:absolute;inset:10px;width:calc(100% - 20px);height:calc(100% - 20px);object-fit:cover;object-position:top;border-radius:30px;opacity:0;transform:scale(1.03);transition:opacity .7s ease,transform 1.2s ease}
+.telefono img.on{opacity:1;transform:none}
+.demo-cap{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);z-index:4;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:var(--on-floor);border-radius:999px;padding:7px 14px;font:700 .82rem var(--display);white-space:nowrap;backdrop-filter:blur(8px)}
+.demo-cap .pt{width:8px;height:8px;border-radius:50%;background:#6FCB94;box-shadow:0 0 0 0 rgba(111,203,148,.6);animation:latido 1.6s infinite}
+@keyframes latido{to{box-shadow:0 0 0 10px rgba(111,203,148,0)}}
+.barra-hero{position:absolute;left:-6%;right:-6%;top:56%;height:140px;z-index:1;pointer-events:none;opacity:.9}
+.barra-hero svg{width:100%;height:100%;overflow:visible}
+@media(max-width:820px){
+  .hero .in{grid-template-columns:minmax(0,1fr)}
+  .escena{min-height:0;order:-1;margin-bottom:22px;padding-bottom:18px}
+  .telefono{width:min(140px,38vw);border-radius:26px;padding:6px}
+  .telefono img{border-radius:21px}
+  .barra-hero{top:48%;height:80px}
+  .hero{padding-block:20px 40px}
+  .hero p{margin-top:14px}
+  .hero .ctas{margin-top:20px}
+  .hero p{max-width:none}
+}
+
+/* ── frases de capítulo ── */
+.frase{padding-block:clamp(56px,9vw,110px)}
+.frase p{font:850 clamp(2.1rem,7vw,5rem)/1.02 var(--display);font-stretch:114%;letter-spacing:-.03em;max-width:16ch}
+.frase em{font-style:normal;color:var(--acc);position:relative}
+.frase .w{display:inline-block;transform-origin:50% 100%}
+
+/* ── problema ── */
+.miedos{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,5vw,64px);align-items:start;margin-top:32px}
+@media(max-width:820px){.miedos{grid-template-columns:minmax(0,1fr)}}
+.miedo-btns{display:grid;gap:10px}
+.miedo-btns button{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:18px 20px;cursor:pointer;font:750 1.08rem/1.3 var(--display);display:flex;gap:14px;align-items:center;transition:border-color .2s,transform .15s}
+.miedo-btns button .d{flex:0 0 auto;width:34px;height:34px;border-radius:50%}
+.miedo-btns button[aria-pressed="true"]{border-color:var(--acc);box-shadow:var(--shadow)}
+.respuesta{background:var(--card);border-radius:var(--r);padding:clamp(22px,4vw,36px);box-shadow:var(--shadow);min-height:100%}
+.respuesta h3{font:850 1.6rem/1.1 var(--display);margin-bottom:12px}
+.respuesta p{color:var(--ink2);font-size:1.05rem}
+.respuesta p+p{margin-top:10px}
+.respuesta b{color:var(--ink)}
+
+/* ── regalo: la calculadora ── */
+.regalo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,56px);align-items:center}
+@media(max-width:820px){.regalo{grid-template-columns:minmax(0,1fr)}}
+.calc{background:var(--card);border-radius:var(--r);padding:clamp(20px,4vw,32px);box-shadow:var(--shadow);display:grid;gap:16px}
+.calc .lbl{font:800 .74rem/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.rangos{display:flex;gap:8px;flex-wrap:wrap}
+.rangos button{border:2px solid var(--line);background:var(--bg);border-radius:var(--pill);padding:8px 16px;min-height:44px;font:750 .95rem var(--data);cursor:pointer}
+.rangos button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.series{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.series label{display:grid;gap:4px;font:700 .72rem var(--display);color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.series input{width:100%;min-width:0;border:2px solid var(--line);background:var(--bg);border-radius:14px;min-height:56px;text-align:center;font:700 1.4rem var(--data);color:var(--ink)}
+.veredicto{border-radius:16px;padding:16px 18px;background:var(--sunk);display:grid;gap:4px}
+.veredicto b{font:900 1.5rem/1.1 var(--display);font-stretch:110%}
+.veredicto[data-t="up"]{background:color-mix(in srgb,var(--ok) 14%,var(--card))} .veredicto[data-t="up"] b{color:var(--ok)}
+.veredicto[data-t="keep"]{background:var(--acc-w)} .veredicto[data-t="keep"] b{color:var(--acc)}
+.veredicto[data-t="down"]{background:color-mix(in srgb,var(--p25) 12%,var(--card))} .veredicto[data-t="down"] b{color:var(--p25)}
+
+/* ── la app: carrusel de capturas reales ── */
+.app-head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+.carril{display:grid;grid-auto-flow:column;grid-auto-columns:min(260px,68vw);gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:28px 20px 24px;margin-inline:-20px;scrollbar-width:thin;perspective:1200px}
+.carril figure{scroll-snap-align:center;display:grid;gap:12px}
+.carril .pant{aspect-ratio:560/1211;border-radius:28px;overflow:hidden;box-shadow:0 0 0 1px var(--line),var(--shadow);background:var(--card);transform:rotateY(var(--ry,0deg)) scale(var(--sc,1));transition:transform .25s}
+.carril .pant img{width:100%;height:100%;object-fit:cover;object-position:top}
+.carril figcaption b{display:block;font:800 1.05rem/1.2 var(--display)}
+.carril figcaption span{font-size:.92rem;color:var(--ink2)}
+.desliza{font:700 .8rem var(--display);color:var(--ink3);letter-spacing:.06em;text-transform:uppercase}
+@media(min-width:1100px){.desliza{display:none}}
+
+/* ── prueba (acto oscuro 2: mis números) ── */
+.prueba{background:var(--floor);color:var(--on-floor)}
+.prueba .lead{color:var(--on-floor2)}
+.lifts{display:grid;gap:14px;margin-top:36px}
+.lift{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr) 5.5rem;gap:16px;align-items:center}
+@media(max-width:620px){.lift{grid-template-columns:minmax(0,1fr) auto}.lift .tr{grid-column:1/-1;order:3}}
+.lift .n{font:800 1rem/1.2 var(--display)}
+.lift .n small{display:block;font:500 .8rem var(--data);color:var(--on-floor2)}
+.lift .tr{position:relative;height:22px;border-radius:11px;background:#1E272E;overflow:hidden}
+.lift .tr .a{position:absolute;inset:0 auto 0 0;background:#3A4650;border-radius:11px}
+.lift .tr .b{position:absolute;inset:0 auto 0 0;border-radius:11px;transform-origin:left}
+.lift .pct{font:900 1.5rem/1 var(--display);font-stretch:110%;text-align:right;color:var(--p15);white-space:nowrap}
+.fuente{font-size:.84rem;color:var(--on-floor2);margin-top:24px;max-width:70ch}
+.big3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:40px}
+@media(max-width:620px){.big3{grid-template-columns:minmax(0,1fr)}}
+.big3 div{border-top:2px solid #2A343C;padding-top:14px}
+.big3 b{display:block;font:900 clamp(2.4rem,6vw,3.4rem)/1 var(--display);font-stretch:116%}
+.big3 span{color:var(--on-floor2);font-size:.95rem}
+
+/* ── cómo funciona ── */
+.pasos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:40px;position:relative}
+@media(max-width:820px){.pasos{grid-template-columns:minmax(0,1fr);gap:28px}}
+.pasos li{padding:0 24px 0 0;position:relative}
+.pasos .num{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font:900 1.4rem var(--data);color:#fff;margin-bottom:16px;position:relative;z-index:2}
+.pasos h3{font:850 1.3rem/1.15 var(--display);margin-bottom:6px}
+.pasos p{color:var(--ink2)}
+.riel{position:absolute;left:32px;right:15%;top:31px;height:3px;background:var(--line);z-index:1}
+.riel i{display:block;height:100%;background:var(--acc);transform-origin:left;transform:scaleX(1)}
+@media(max-width:820px){.riel{display:none}}
+
+/* ── niveles ── */
+.niveles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:40px}
+.niveles.tres{grid-template-columns:repeat(3,minmax(0,1fr))}
+.nivs{margin-top:28px}
+.lbl-n{font:800 .78rem/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.nivs-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:820px){.niveles.tres,.nivs-g{grid-template-columns:minmax(0,1fr)}}
+.niv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px 16px;text-decoration:none;transition:border-color .2s,transform .15s}
+.niv:hover{border-color:var(--acc)}
+.niv .d2{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 6px rgba(0,0,0,.14)}
+.niv b{font:850 1.1rem/1.1 var(--display);display:block}
+.niv span{font-size:.88rem;color:var(--ink2)}
+@media(max-width:1060px){.niveles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.niveles{grid-template-columns:minmax(0,1fr)}}
+.nv{background:var(--card);border-radius:var(--r);padding:24px 22px;box-shadow:var(--shadow);display:grid;gap:10px;align-content:start;position:relative;overflow:hidden;border:2px solid transparent}
+.nv.top{border-color:var(--acc)}
+.nv .disco{width:58px;height:58px;border-radius:50%;box-shadow:inset 0 0 0 9px rgba(0,0,0,.14),inset 0 0 0 20px rgba(255,255,255,.12)}
+.nv .k{font:800 .74rem/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.nv h3{font:900 1.7rem/1 var(--display);font-stretch:112%}
+.nv .precio{font:800 2rem/1 var(--data)}
+.nv .precio small{font:600 .85rem var(--body);color:var(--ink3)}
+.nv p{color:var(--ink2);font-size:.95rem}
+.nv ul li{font-size:.94rem;padding-left:22px;position:relative;margin-top:6px}
+.nv ul li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
+.nv .demo{margin-top:6px;font:800 .9rem var(--display);color:var(--acc);text-decoration:none}
+.fund{margin-top:22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--ink2)}
+.fund b{color:var(--ink)}
+
+/* ── guía ── */
+.guia{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(24px,5vw,64px);align-items:start}
+@media(max-width:820px){.guia{grid-template-columns:minmax(0,1fr)}.guia .txt{order:-1}}
+.ficha{background:var(--card);border-radius:var(--r);padding:28px;box-shadow:var(--shadow);display:grid;gap:14px}
+.ficha .mono{font-size:.95rem}
+.ficha dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px;margin:0}
+.ficha dt{font:700 .78rem var(--display);color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;padding-top:3px}
+.ficha dd{margin:0;font-weight:700}
+.guia .txt p{color:var(--ink2);font-size:1.08rem;max-width:58ch}
+.guia .txt p+p{margin-top:14px}
+.guia .txt b{color:var(--ink)}
+.no-soy{margin-top:20px;border-left:4px solid var(--p15);padding:10px 16px;background:var(--card);border-radius:0 14px 14px 0;font-size:.98rem}
+
+/* ── quiz ── */
+.quiz{background:var(--card);border-radius:var(--r);padding:clamp(22px,4vw,40px);box-shadow:var(--shadow);margin-top:32px;display:grid;gap:22px}
+.q p{font:800 1.15rem/1.3 var(--display);margin-bottom:10px}
+.q .ops{display:flex;flex-wrap:wrap;gap:8px}
+.q .ops button{border:2px solid var(--line);background:var(--bg);border-radius:var(--pill);padding:10px 18px;min-height:48px;cursor:pointer;font:700 .98rem var(--body)}
+.q .ops button[aria-pressed="true"]{border-color:var(--acc);background:var(--acc);color:var(--acc-ink)}
+.resultado{border-radius:18px;background:var(--acc-w);padding:22px;display:grid;gap:10px}
+.resultado b{font:900 1.6rem/1.1 var(--display)}
+
+/* ── así sería tu plan ── */
+.tp-niv{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 16px}
+.tp-niv button{border:2px solid var(--line);background:var(--card);border-radius:var(--pill);padding:10px 18px;min-height:48px;font:800 .95rem var(--display);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.tp-niv button i{width:14px;height:14px;border-radius:50%}
+.tp-niv button[aria-selected="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.tp{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.tp-head{background:var(--floor);color:var(--on-floor);padding:22px clamp(18px,4vw,32px);display:grid;gap:10px}
+.tp-head h3{font:900 clamp(1.6rem,5vw,2.4rem)/1 var(--display);font-stretch:114%}
+.tp-head p{color:var(--on-floor2)}
+.tp-stats{display:flex;flex-wrap:wrap;gap:8px}
+.tp-stats span{background:rgba(255,255,255,.08);border-radius:999px;padding:6px 12px;font:700 .82rem var(--display)}
+.tp-sem{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:16px clamp(14px,4vw,32px) 4px}
+.tp-sem button{border:1px solid var(--line);background:var(--bg);border-radius:12px;min-height:62px;cursor:pointer;display:grid;place-items:center;gap:2px;padding:4px 2px;font:700 .72rem var(--display);color:var(--ink3)}
+.tp-sem button b{font:900 .8rem var(--display);color:var(--ink)}
+.tp-sem button.ent{background:var(--acc-w);border-color:var(--acc);color:var(--acc)}
+.tp-sem button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.tp-sem button[aria-selected="true"] b{color:#fff}
+.tp-dia{padding:12px clamp(14px,4vw,32px) 24px}
+.tp-dia h4{font:900 1.3rem var(--display);margin:6px 0 10px}
+.tp-ex{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.tp-ex .n{width:30px;height:30px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font:700 .8rem var(--data)}
+.tp-ex b{font:800 1rem/1.25 var(--display)}
+.tp-ex .pr{font:700 .9rem var(--data);color:var(--acc);margin-top:2px}
+.tp-ex .alt{font-size:.85rem;color:var(--ink2);margin-top:4px}
+.tp-ex .tec{font-size:.85rem;color:var(--ink3);margin-top:4px}
+.tp-ex .op{display:inline-block;font:700 .66rem var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border:1px dashed var(--line);border-radius:999px;padding:2px 8px;margin-left:6px;white-space:nowrap;vertical-align:2px}
+@media(max-width:620px){.tp-sem .tpd-b{font-size:0}.tp-sem .tpd-b::after{content:'●';font-size:.8rem}.tp-sem button:disabled .tpd-b::after{content:'–'}}
+.tp-pie{display:flex;gap:10px;flex-wrap:wrap;padding:0 clamp(14px,4vw,32px) 24px}
+@media(max-width:520px){.tp-sem{gap:4px}.tp-sem button{min-height:54px;font-size:.62rem}}
+
+/* ── franja en movimiento ── */
+.franja{background:var(--floor);color:var(--on-floor);overflow:hidden;border-top:1px solid #1F282E;padding-block:16px}
+.fr-in{display:flex;gap:22px;align-items:center;width:max-content;animation:franja 38s linear infinite;font:800 1rem var(--display);white-space:nowrap}
+.fr-in i{width:9px;height:9px;border-radius:50%;background:var(--p15);flex:0 0 auto}
+.fr-in i:nth-of-type(3n){background:var(--p25)} .fr-in i:nth-of-type(3n+1){background:var(--p20)}
+@keyframes franja{to{transform:translateX(-50%)}}
+.mo-off .fr-in{animation:none}
+.mo-soft .fr-in{animation-duration:70s}
+/* ── sin plan / con MODO y para quién ── */
+.vs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:28px}
+@media(max-width:720px){.vs{grid-template-columns:minmax(0,1fr)}}
+.vs-c{border-radius:var(--r);padding:22px;display:grid;gap:12px;align-content:start}
+.vs-c.no{background:var(--card);border:1px solid var(--line)}
+.vs-c.si{background:var(--floor);color:var(--on-floor);box-shadow:var(--shadow)}
+.vs-k{font:900 1.2rem var(--display)}
+.vs-c ul{display:grid;gap:10px}
+.vs-c li{padding-left:28px;position:relative;font-size:1rem;line-height:1.45}
+.vs-c.no li{color:var(--ink2)}
+.vs-c.no li::before{content:"✕";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--p25) 15%,transparent);color:var(--p25);font:800 .7rem/20px var(--display);text-align:center}
+.vs-c.si li::before{content:"✓";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#6FCB94;color:#0A0E11;font:800 .72rem/20px var(--display);text-align:center}
+/* ── todo lo que recibes ── */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:32px}
+@media(max-width:1000px){.bento{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.bento{grid-template-columns:minmax(0,1fr)}}
+.bt{background:var(--card);border-radius:var(--r);padding:20px;display:grid;gap:8px;align-content:start;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .2s}
+.bt:hover{transform:translateY(-3px)}
+.bt::after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:var(--c);opacity:.12}
+.bt.big{grid-column:span 2;background:var(--floor);color:var(--on-floor)}
+@media(max-width:520px){.bt.big{grid-column:auto}}
+.bt.big p{color:var(--on-floor2)}
+.bt-ic{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:var(--c);color:#fff}
+.bt h3{font:850 1.15rem/1.2 var(--display)}
+.bt p{color:var(--ink2);font-size:.95rem}
+/* ── precio mensual o trimestral ── */
+.per{display:inline-flex;gap:4px;background:var(--sunk);border-radius:999px;padding:4px;margin-top:24px}
+.per button{border:0;background:transparent;border-radius:999px;padding:10px 18px;min-height:44px;font:800 .92rem var(--display);cursor:pointer;color:var(--ink2)}
+.per button b{color:var(--ok);margin-left:4px}
+.per button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.nv .cinta{position:absolute;top:14px;right:-34px;transform:rotate(35deg);background:var(--acc);color:#fff;font:800 .68rem var(--display);letter-spacing:.06em;text-transform:uppercase;padding:5px 40px}
+.nv .ahorro{font:700 .82rem var(--data);color:var(--ok)}
+.nv-cta{margin-top:10px;width:100%}
+.nv .btn.line{color:var(--ink)}
+
+/* ── preguntas ── */
+.faq{margin-top:28px;max-width:860px}
+.faq details{border-top:1px solid var(--line)}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;min-height:64px;display:flex;align-items:center;gap:12px;font:800 1.12rem/1.3 var(--display)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;font:400 1.6rem var(--body);color:var(--ink3);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{color:var(--ink2);padding-bottom:20px;max-width:64ch}
+
+/* ── cierre (acto oscuro 3) ── */
+.cierre{background:var(--floor);color:var(--on-floor);text-align:left}
+.cierre .h2{max-width:14ch}
+.cierre .lead{color:var(--on-floor2);margin-top:16px}
+.cierre .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;align-items:center}
+.cierre .num{font:700 1.1rem var(--data);color:var(--on-floor)}
+.cierre .btn.line{color:var(--on-floor)}
+footer{background:var(--floor);color:var(--on-floor2);font-size:.82rem;padding-block:24px 110px;border-top:1px solid #1F282E}
+footer p{max-width:80ch}
+footer p+p{margin-top:8px}
+
+/* ── CTA fijo en celular: aparece después del hero, se esconde en el quiz y el cierre ── */
+.fijo{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;gap:8px;transform:translateY(140%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.fijo .btn{flex:1;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
+body.past-hero:not(.at-cta) .fijo{transform:none}
+@media(min-width:900px){.fijo{display:none}}
+.anim-btn{position:fixed;right:12px;top:76px;z-index:45;font:700 .8rem var(--display);border-radius:var(--pill);border:1px solid var(--line);background:var(--card);padding:8px 14px;cursor:pointer;box-shadow:var(--shadow)}
+#diag{position:fixed;inset:auto 12px 12px 12px;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font:12px/1.5 var(--data);max-height:50vh;overflow:auto;white-space:pre-wrap}
+@media (prefers-reduced-motion: reduce){ .carril .pant{transition:none} }
+</style>
+
+<nav class="nav" aria-label="Principal"><div class="in"><a class="logo" href="#inicio">MODO<em>·</em></a><a class="btn go" id="nav-wa" href="#" target="_blank" rel="noopener">Escríbeme</a></div></nav>
+
+<header class="hero" id="inicio" data-chapter="Inicio">
+  <div class="in">
+    <div class="txt">
+      <h1 class="h-in">Por fin vas a <em>ver</em> tu progreso.</h1>
+      <p class="h-in">Programa a tu nivel, una app que te dice qué levantar cada día y un coach que revisa tu semana.</p>
+      <div class="ctas h-in"><a class="btn go" href="#app">Ver cómo funciona</a><a class="btn line" href="#nivel">¿Qué nivel soy?</a></div>
+    </div>
+    <div class="escena" aria-hidden="true">
+      <div class="telefono" id="demo-tel"><img class="on" src="img/hoy.jpg" alt="" width="560" height="1211"><img src="img/gym.jpg" alt="" width="560" height="1211"><img src="img/ent.jpg" alt="" width="560" height="1211"><img src="img/retro.jpg" alt="" width="560" height="1211"><img src="img/av.jpg" alt="" width="560" height="1211"><img src="img/const.jpg" alt="" width="560" height="1211"><img src="img/com.jpg" alt="" width="560" height="1211"></div>
+      <p class="demo-cap" id="demo-cap" aria-live="polite"><span class="pt"></span><b>Tu día en una barra</b></p>
+      <div class="barra-hero"><svg viewBox="0 0 600 140" id="barra"></svg></div>
+    </div>
+  </div>
+</header>
+
+<div class="franja" aria-label="Lo que trae la app"><div class="fr-in"><span>Modo gym</span><i></i><span>Retro al terminar</span><i></i><span>Récords automáticos</span><i></i><span>Logros y racha</span><i></i><span>Plan a tu nivel</span><i></i><span>Alternativas por ejercicio</span><i></i><span>70 alimentos mexicanos</span><i></i><span>Recetas</span><i></i><span>Misión semanal</span><i></i><span>Tu coach cada viernes</span><i></i><span>Modo gym</span><i></i><span>Retro al terminar</span><i></i><span>Récords automáticos</span><i></i><span>Logros y racha</span><i></i><span>Plan a tu nivel</span><i></i><span>Alternativas por ejercicio</span><i></i><span>70 alimentos mexicanos</span><i></i><span>Recetas</span><i></i><span>Misión semanal</span><i></i><span>Tu coach cada viernes</span><i></i></div></div>
+
+<section id="problema" data-chapter="El problema">
+  <div class="in">
+    <h2 class="h2">¿Vas al gym y el espejo no cambia?</h2>
+    <p class="lead" style="margin-top:14px">Casi siempre es una de estas tres. Toca la tuya.</p>
+    <div class="miedos" data-fears>
+      <div class="miedo-btns">
+        <button type="button" data-m="0" aria-pressed="true"><span class="d" style="background:var(--p25)"></span>No sé cuándo subir de peso</button>
+        <button type="button" data-m="1" aria-pressed="false"><span class="d" style="background:var(--p15)"></span>Copio rutinas de internet</button>
+        <button type="button" data-m="2" aria-pressed="false"><span class="d" style="background:var(--p10)"></span>Empiezo con todo y a las 3 semanas lo dejo</button>
+      </div>
+      <div class="respuesta" id="resp" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section class="vs-s" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Lo que cambia</h2>
+    <div class="vs">
+      <div class="vs-c no"><p class="vs-k">Entrenando por tu cuenta</p><ul><li>Llegas al gym y decides en el momento</li><li>Repites el mismo peso semanas o subes de más</li><li>No sabes si avanzas hasta que el espejo cambia</li><li>Una rutina de internet que no conoce tu gym</li><li>Nadie ve tu semana; si faltas, nadie pregunta</li></ul></div>
+      <div class="vs-c si"><p class="vs-k">Con MODO</p><ul><li>Abres la app y sabes qué levantar, con cuánto peso</li><li>La app te dice cuándo subir, serie por serie</li><li>Ves tu fuerza subir cada semana, con récords</li><li>Un programa a tu nivel, con alternativas para tu gym</li><li>Cada viernes reviso tu semana y te escribo</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="frase in" data-frase><p>Lo que no se mide, no <em>sube</em>.</p></div>
+
+<section id="regalo" data-chapter="Gratis" style="padding-top:0">
+  <div class="in regalo">
+    <div>
+      <h2 class="h2">La regla que te da fuerza gratis</h2>
+      <p class="lead" style="margin-top:14px">Se llama doble progresión. Primero subes repeticiones dentro de un rango; cuando todas tus series tocan el tope, subes el peso. Pon tu última sesión de cualquier ejercicio y te digo qué hacer la próxima.</p>
+      <p class="lead" style="margin-top:12px">Es lo mismo que calcula la app después de cada sesión, ejercicio por ejercicio.</p>
+    </div>
+    <div class="calc">
+      <div><p class="lbl">Tu rango de repeticiones</p><div class="rangos" id="rangos"><button type="button" data-r="6-10" aria-pressed="false">6 a 10</button><button type="button" data-r="8-12" aria-pressed="true">8 a 12</button><button type="button" data-r="10-15" aria-pressed="false">10 a 15</button><button type="button" data-r="12-20" aria-pressed="false">12 a 20</button></div></div>
+      <div><p class="lbl">Repeticiones de tus 3 series</p><div class="series"><label for="s1">Serie 1<input id="s1" type="number" inputmode="numeric" min="0" value="12"></label><label for="s2">Serie 2<input id="s2" type="number" inputmode="numeric" min="0" value="11"></label><label for="s3">Serie 3<input id="s3" type="number" inputmode="numeric" min="0" value="10"></label></div></div>
+      <div class="veredicto" id="veredicto" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section id="app" data-chapter="La app" style="padding-top:0">
+  <div class="in">
+    <div class="app-head"><div><h2 class="h2">Tu entrenador, en el bolsillo</h2><p class="lead" style="margin-top:14px">Así se ve por dentro. Son pantallas reales de un demo con datos de ejemplo.</p></div><span class="desliza">Desliza →</span></div>
+    <div class="carril" id="carril">
+      <figure><div class="pant"><img src="img/gym.jpg" alt="Modo gym: un ejercicio a la vez, botones de más y menos y la serie se marca con un toque" loading="lazy" width="560" height="1211"></div><figcaption><b>Modo gym</b><span>Un ejercicio a la vez, sin teclado. Marcas la serie con un toque y el descanso arranca solo.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/hoy.jpg" alt="Pantalla Hoy: la barra con los cinco hábitos del día y el check-in" loading="lazy" width="560" height="1211"></div><figcaption><b>Tu día en una barra</b><span>Entreno, comida, sueño, pasos y agua. Cada hábito es un disco.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/ent.jpg" alt="Sesión: cronómetro, músculos del día y el peso y las repeticiones que tocan" loading="lazy" width="560" height="1211"></div><figcaption><b>Qué levantar hoy</b><span>Peso y repeticiones por serie, lo que hiciste la última vez, discos por lado, video y alternativas.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/retro.jpg" alt="Retro al terminar la sesión: series en rango, bien, corrige y próxima vez" loading="lazy" width="560" height="1211"></div><figcaption><b>Tu retro al terminar</b><span>Tres líneas: lo que salió bien, qué corregir y qué hacer la próxima vez.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/av.jpg" alt="Récords personales detectados solos, con tu mejor marca en cada ejercicio" loading="lazy" width="560" height="1211"></div><figcaption><b>Tus récords, solitos</b><span>Cada vez que superas tu mejor serie, la app lo detecta, lo festeja y lo guarda.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/com.jpg" alt="Comida: el plato y los tiempos del día con palomita" loading="lazy" width="560" height="1211"></div><figcaption><b>Comer para entrenar</b><span>Una guía práctica con tu plato y tus tiempos. Sin dietas raras.</span></figcaption></figure>
+      <figure><div class="pant"><img src="img/const.jpg" alt="Logros: medallas por sesiones, récords, racha, sueño y agua" loading="lazy" width="560" height="1211"></div><figcaption><b>Logros y racha</b><span>Medallas por constancia, récords, sueño y agua. Tu racha de días, siempre a la vista.</span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="recibes" data-chapter="Lo que recibes" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Todo lo que recibes</h2>
+    <p class="lead" style="margin-top:14px">No es un PDF con una rutina: es una app completa, hecha para entrenar a distancia sin sentirte solo.</p>
+    <div class="bento"><article class="bt big" style="--c:var(--p20)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg></span><h3>Modo gym</h3><p>Un ejercicio a la vez, sin teclado. Marcas la serie y el descanso arranca solo.</p></article><article class="bt" style="--c:var(--p25)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span><h3>Tu retro al terminar</h3><p>Lo que salió bien, qué corregir y qué hacer la próxima vez.</p></article><article class="bt" style="--c:var(--p15)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg></span><h3>Récords automáticos</h3><p>La app detecta cada vez que superas tu mejor marca y lo festeja.</p></article><article class="bt" style="--c:var(--p10)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></svg></span><h3>Plan a tu nivel</h3><p>Fases del bloque, metas con barra y alternativas por ejercicio.</p></article><article class="bt" style="--c:var(--p20)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg></span><h3>Comida sin complicarte</h3><p>Tu plato, porciones con la mano, recetas y lista del súper.</p></article><article class="bt" style="--c:var(--p25)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.8 3.6 5 5.2 5 10a5 5 0 0 1-10 0c0-2.8 1.8-4 2.2-6 1.6 1 2.6 2.8 2.6 2.8S13 6.8 12 3z"/></svg></span><h3>Misión y racha</h3><p>Cinco hábitos por semana y tu racha de días a la vista.</p></article><article class="bt" style="--c:var(--p15)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M6 16v-4M11 16V7M16 16v-6M20 16V4"/></svg></span><h3>Tus avances</h3><p>Fuerza, cuerpo, constancia y tu semana en historias.</p></article><article class="bt" style="--c:var(--p10)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg></span><h3>Aprende el porqué</h3><p>Mini clases con fuente: RPE, descanso, proteína, sueño.</p></article></div>
+  </div>
+</section>
+
+<section class="prueba" id="prueba" data-chapter="Prueba">
+  <div class="in">
+    <h2 class="h2">Mis números, 8 semanas</h2>
+    <p class="lead" style="margin-top:14px">Antes de vendértelo lo probé en mí. Este es mi Bloque 2, registrado serie por serie en la misma app que vas a usar.</p>
+    <div class="lifts" id="lifts">
+      <div class="lift"><span class="n">Hack squat<small>210 → 250 lb</small></span><div class="tr"><span class="a" style="width:84%"></span><span class="b" style="width:100%;background:var(--p25)"></span></div><span class="pct">+19 %</span></div>
+      <div class="lift"><span class="n">Peso muerto rumano<small>185 → 225 lb</small></span><div class="tr"><span class="a" style="width:82%"></span><span class="b" style="width:100%;background:var(--p20)"></span></div><span class="pct">+22 %</span></div>
+      <div class="lift"><span class="n">Jalón al pecho<small>140×7 → 160×9 lb</small></span><div class="tr"><span class="a" style="width:82%"></span><span class="b" style="width:100%;background:var(--p15)"></span></div><span class="pct">+22 %</span></div>
+      <div class="lift"><span class="n">Press inclinado<small>75×6 → 75×10 lb por mano</small></span><div class="tr"><span class="a" style="width:88%"></span><span class="b" style="width:100%;background:var(--p10)"></span></div><span class="pct">+13 %</span></div>
+    </div>
+    <div class="big3">
+      <div><b class="mono" data-cuenta="90">90 %</b><span>de series dentro de su rango en la semana 8 (en la 1 eran 28 %)</span></div>
+      <div><b class="mono" data-cuenta="5">5 de 5</b><span>sesiones en la última semana del bloque</span></div>
+      <div><b class="mono" data-cuenta="60">60 min</b><span>por sesión. Lo opcional va aparte</span></div>
+    </div>
+    <p class="fuente">Fuerza estimada (1RM, fórmulas de Epley y Brzycki) de la mejor serie de la semana 1 contra la semana 8. Bloque del 17 de agosto al 11 de octubre de 2026. Son mis resultados: los tuyos dependen de tu punto de partida, tu sueño y tu constancia.</p>
+  </div>
+</section>
+
+<div class="frase in" data-frase><p>La constancia se ve en una <em>barra</em>.</p></div>
+
+<section id="como" data-chapter="Cómo funciona" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Tres pasos y arrancas</h2>
+    <ol class="pasos"><span class="riel" aria-hidden="true"><i id="riel"></i></span>
+      <li><span class="num" style="background:var(--p25)">1</span><h3>Me escribes</h3><p>Contestas 4 preguntas: cuánto llevas entrenando, cuántos días puedes, qué quieres cambiar y si algo te duele.</p></li>
+      <li><span class="num" style="background:var(--p20)">2</span><h3>Pruebas tu nivel</h3><p>Te digo qué nivel te toca y te mando el demo para que toques la app antes de pagar un peso.</p></li>
+      <li><span class="num" style="background:var(--p10)">3</span><h3>Tu panel en 48 horas</h3><p>Con tus días reales, tu gym y tus gustos. Cada viernes reviso tu semana y ajusto lo que toca.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="paraquien" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">¿Es para ti?</h2>
+    <div class="vs">
+      <div class="vs-c si"><p class="vs-k">Es para ti si</p><ul><li>Ya vas al gym, o quieres empezar con un plan claro</li><li>Quieres ver tu avance con números, no solo en el espejo</li><li>Te late anotar tus series y seguir un programa</li><li>Puedes entrenar de 3 a 5 días por semana</li></ul></div>
+      <div class="vs-c no"><p class="vs-k">No es para ti si</p><ul><li>Buscas resultados en dos semanas</li><li>Quieres un entrenador a tu lado en el gym</li><li>Necesitas una dieta para una enfermedad (ahí va un profesional con cédula)</li><li>No vas a anotar nada: sin registro no hay ajustes</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="niveles" data-chapter="Niveles" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Elige cómo te acompaño</h2>
+    <p class="lead" style="margin-top:14px">Tu nivel define tu programa; el plan define cuánto te acompaño. Cualquier nivel entra en cualquier plan, y cambias de plan cuando quieras.</p>
+    <div class="per" role="group" aria-label="Forma de pago"><button type="button" data-per="1" aria-pressed="true">Mensual</button><button type="button" data-per="3" aria-pressed="false">Trimestral <b>−10 %</b></button></div>
+    <div class="niveles tres" id="lista-niveles"></div>
+    <div class="nivs"><p class="lbl-n">Tu programa según tu nivel · toca para ver el demo</p><div class="nivs-g" id="lista-nivs"></div></div>
+    <p class="fund"><span class="pill-f" style="background:var(--p15);color:#1a1300;border-radius:999px;padding:6px 14px;font:800 .9rem var(--display);letter-spacing:.02em">Fundadores</span><span>Los primeros 5 pagan <b>25 % menos sus 3 primeros meses</b>. Pago trimestral: 10 % menos.</span></p>
+  </div>
+</section>
+
+<section id="guia" data-chapter="Quién soy" style="padding-top:0">
+  <div class="in guia">
+    <aside class="ficha">
+      <img src="img/dali.jpg" alt="Dalí, tu coach de MODO" width="560" height="560" style="width:140px;height:140px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px var(--card),0 0 0 6px var(--acc)">
+      <p class="logo" style="font-size:1.6rem">DALÍ IBARRA</p>
+      <dl><dt>Base</dt><dd>Guadalajara, Jalisco</dd><dt>Entreno</dt><dd>4 a 5 días por semana, con registro</dd><dt>Método</dt><dd>Basado en evidencia científica, con tu progreso medido serie por serie</dd><dt>Formato</dt><dd>100 % a distancia, desde tu gym</dd></dl>
+    </aside>
+    <div class="txt">
+      <h2 class="h2" style="margin-bottom:18px">Quién te acompaña</h2>
+      <p>Soy Dalí. Llevo años entrenando y durante mucho tiempo hice lo mismo que tú: rutinas sueltas, pesos al tanteo y resultados que no llegaban. Lo que cambió todo fue <b>medir</b>: anotar cada serie, saber cuándo subir y revisar la semana con números.</p>
+      <p>Esta app nació de eso: registro, retro al terminar, récords que se detectan solos, logros y tu racha de días. La uso yo todos los días y ahora la armo para ti, con tu nivel, tus días y tus gustos. No te acompaño en persona, por eso el paquete es lo más completo posible: video de cada ejercicio, alternativas, tu retro al terminar y mi revisión cada semana.</p>
+      <p class="no-soy"><b>No soy nutriólogo.</b> Te doy una guía práctica para comer bien y entrenar mejor. Si quieres un plan con calorías y gramos, te conecto con una nutrióloga con cédula y lo integro a tu app.</p>
+    </div>
+  </div>
+</section>
+
+<section id="nivel" data-chapter="Tu nivel" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">¿Qué nivel soy?</h2>
+    <p class="lead" style="margin-top:14px">Cuatro preguntas. Al final te digo tu nivel y, si quieres, me lo mandas por WhatsApp con tus respuestas.</p>
+    <div class="quiz" id="quiz"></div>
+  </div>
+</section>
+
+<section id="tuplan" data-chapter="Tu plan" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Así sería tu plan</h2>
+    <p class="lead" style="margin-top:14px" id="tp-lead">Este es el programa base de cada nivel, tal como lo verías en tu app. Al arrancar lo ajusto a tus días, tu gym y lo que te guste.</p>
+    <div class="tp-niv" id="tp-niv" role="tablist"></div>
+    <div class="tp" id="tp"></div>
+  </div>
+</section>
+
+<section id="dudas" data-chapter="Dudas" style="padding-top:0">
+  <div class="in">
+    <h2 class="h2">Lo que más me preguntan</h2>
+    <div class="faq">
+      <details><summary>¿Necesito un gym?</summary><p>Sí, los programas están hechos para gym con máquinas, poleas y mancuernas. Si a tu gym le falta algo, cada ejercicio trae alternativas y lo ajustamos en tu panel.</p></details>
+      <details><summary>¿Es presencial?</summary><p>No. Todo es a distancia: tu app, tus videos de técnica y mi revisión cada viernes. Por eso cada ejercicio trae video, clave técnica y alternativas.</p></details>
+      <details><summary>¿Y la comida?</summary><p>Te doy una guía práctica: proteína en cada comida, la mitad del plato verdura y porciones con tu mano. Si quieres un plan con calorías y gramos, te conecto con una nutrióloga con cédula.</p></details>
+      <details><summary>¿Qué pasa si algo me duele?</summary><p>Lo marcas en la app y me escribes ese mismo día. Antes de arrancar contestas un cuestionario de salud: si algo sale en rojo, primero pasas con tu médico.</p></details>
+      <details><summary>¿Cuánto tiempo necesito?</summary><p>De 3 a 5 días de 60 minutos, según tu nivel. Lo opcional va marcado para que lo hagas solo si te sobra tiempo.</p></details>
+      <details><summary>¿Sirve si nunca he entrenado?</summary><p>Sí. El nivel Principiante arranca con 3 días de cuerpo completo, cada ejercicio con video y clave técnica, y pesos que eliges tú para aprender bien el movimiento.</p></details>
+      <details><summary>¿Es igual para mujeres?</summary><p>Los principios son los mismos. Lo que cambia es la prioridad: si tu meta es glúteo y pierna, el programa se arma con eso al frente.</p></details>
+      <details><summary>¿Necesito suplementos?</summary><p>No. Aquí no se recetan. Si te interesa alguno, como la creatina, consúltalo con tu médico o con un profesional de la nutrición.</p></details>
+      <details><summary>¿Cómo se paga y puedo cancelar?</summary><p>Por transferencia, mes a mes. Cancelas cuando quieras avisando antes de tu siguiente mes, y cambias de plan cuando quieras: si empiezas con App y quieres que revise tu semana, pasas a Coaching.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="cierre" id="cierre" data-chapter="Empieza">
+  <div class="in">
+    <h2 class="h2">Ya viste cómo funciona. Ahora, <span style="color:var(--p15)">tus números</span>.</h2>
+    <p class="lead">Escríbeme y en menos de un día te digo tu nivel y te mando tu demo.</p>
+    <div class="ctas"><a class="btn wa" id="cierre-wa" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a><span class="num mono" id="num-txt"></span><button type="button" class="btn line" id="copiar-num">Copiar número</button></div>
+  </div>
+</section>
+<footer><div class="in"><p>MODO es un servicio de entrenamiento a distancia de Dalí Ibarra. No es atención médica ni nutricional: antes de empezar se aplica un cuestionario de salud (PAR-Q+) y, si hace falta, se recomienda acudir con un profesional.</p><p>Las pantallas de la app son de un demo con datos de ejemplo. Los números de la sección «Mis números» son de Dalí.</p></div></footer>
+
+<div class="fijo" aria-hidden="false"><a class="btn go" href="#nivel">¿Qué nivel soy?</a><a class="btn wa" id="fijo-wa" href="#" target="_blank" rel="noopener">WhatsApp</a></div>
+<button type="button" class="anim-btn" id="anim-btn" hidden>✨ Activar todas las animaciones</button>
+
+<script id="bases" type="application/json">{"principiante":{"nivel":"Principiante","para":"Menos de 1 año entrenando con constancia, o regresando después de mucho tiempo.","promesa":"Aprender los movimientos bien y ver fuerza nueva cada semana.","semanas":8,"descarga":null,"rpe":"7 a 8","cardio":"Camina 7,000 pasos al día. Si te gusta el cardio, 2 sesiones de 20 a 30 minutos a ritmo de plática.","dias":[{"d":"Lunes","n":"Cuerpo completo A","e":[["Prensa de piernas","3×10–12","2 min",["Sentadilla goblet con mancuerna","Sentadilla en Smith"],false,"Pies a la anchura de los hombros. Baja hasta donde tu cadera no se despegue del asiento y empuja con todo el pie."],["Press de pecho en máquina","3×10–12","2 min",["Press con mancuernas en banca plana","Lagartijas"],false,"Hombros atrás y abajo, codos a 45 grados. Baja hasta sentir el estiramiento del pecho."],["Jalón al pecho","3×10–12","2 min",["Jalón con agarre neutro","Remo en máquina"],false,"Primero baja los hombros, luego jala con los codos hacia las costillas. Sin balancearte."],["Curl femoral sentado","2×12–15","90 s",["Curl femoral acostado"],false,"Cadera pegada al asiento, baja lento y estira completo."],["Elevación lateral con mancuerna","2×12–15","90 s",["Elevación lateral en polea"],false,"Sube hasta la altura del hombro, un poco al frente, sin impulso."],["Plancha","2×20–40 s","60 s",["Dead bug"],true,"Glúteos apretados y costillas abajo. Si la cadera se cae, termina la serie."]]},{"d":"Miércoles","n":"Cuerpo completo B","e":[["Hip thrust en máquina","3×10–12","2 min",["Puente de glúteo con mancuerna","Patada de glúteo en polea"],false,"Respaldo bajo los omóplatos, barbilla al pecho, sube con el glúteo y pausa arriba sin arquear la espalda."],["Remo sentado en polea","3×10–12","2 min",["Remo con mancuerna apoyado"],false,"Pecho alto, jala con los codos hacia la cadera y estira completo al regresar."],["Press de hombro en máquina","3×10–12","2 min",["Press con mancuernas sentado"],false,"Espalda pegada al respaldo, baja hasta la altura de las orejas."],["Extensión de cuádriceps","2×12–15","90 s",["Zancada estática"],false,"Espalda pegada al respaldo, pausa arriba y baja lento."],["Curl con mancuernas","2×10–15","90 s",["Curl martillo"],false,"Codos quietos junto al cuerpo, baja completo."],["Extensión de tríceps con cuerda","2×10–15","90 s",["Fondos en banca"],false,"Codos pegados, abre la cuerda al final y regresa lento."]]},{"d":"Viernes","n":"Cuerpo completo C","e":[["Sentadilla goblet","3×8–12","2 min",["Prensa de piernas","Sentadilla en Smith"],false,"Mancuerna al pecho, rodillas siguiendo la punta del pie, baja tan profundo como mantengas la espalda neutra."],["Press inclinado con mancuernas","3×8–12","2 min",["Press inclinado en máquina"],false,"Banca a 30 grados, codos a 45, baja hasta el estiramiento sin rebotar."],["Remo con pecho apoyado","3×10–12","2 min",["Remo en máquina","Remo con mancuerna"],false,"Pecho pegado al banco, codos atrás, sin despegar el pecho."],["Peso muerto rumano con mancuernas","3×10–12","2 min",["Hiperextensión de glúteo","Curl femoral sentado"],false,"Cadera atrás, mancuernas pegadas a las piernas, espalda neutra. Para cuando ya no la puedas mantener."],["Face pull","2×15–20","90 s",["Pájaro con mancuernas"],false,"Cuerda a la altura de la frente, separa las manos al final y aprieta atrás."],["Elevación de talones de pie","2×12–15","60 s",["Talones en prensa"],true,"Pausa de un segundo abajo en el estiramiento y sube completo."]]}]},"intermedio":{"nivel":"Intermedio","para":"De 1 a 3 años entrenando con constancia. Ya dominas los básicos y el progreso se volvió lento.","promesa":"Romper el estancamiento con volumen bien repartido y progresión por semana.","semanas":8,"descarga":4,"rpe":"8","cardio":"8,000 pasos al día. 2 sesiones de cardio de 25 minutos en zona 2, lejos de los días de pierna.","dias":[{"d":"Lunes","n":"Torso A","e":[["Press de pecho en máquina","3×8–12","3 min",["Press con mancuernas en banca"],false,"Hombros atrás y abajo, codos a 45 grados, baja hasta el estiramiento del pecho."],["Jalón al pecho","3×8–12","2 a 3 min",["Jalón con agarre neutro"],false,"Primero baja los hombros, codos hacia las costillas, sin balancear el torso."],["Remo sentado en polea","3×10–15","2 min",["Remo con mancuerna apoyado"],false,"Pecho alto, jala con los codos hacia la cadera y estira completo."],["Elevación lateral con mancuerna","3×12–20","2 min",["Elevación lateral en polea"],false,"Hasta la altura del hombro, un poco al frente, sin impulso."],["Extensión de tríceps sobre la cabeza en polea","2×10–15","90 s",["Press francés con mancuerna"],false,"Codos apuntando al frente, baja hasta el estiramiento detrás de la cabeza."],["Face pull","2×15–20","90 s",["Pájaro con mancuernas"],true,"Cuerda a la frente, separa las manos al final."]]},{"d":"Martes","n":"Pierna A","e":[["Hip thrust en máquina","3×8–12","3 min",["Hip thrust con barra","Puente de glúteo con mancuerna"],false,"Respaldo bajo los omóplatos, barbilla al pecho, pausa arriba sin arquear."],["Prensa de piernas","3×8–12","3 min",["Sentadilla hack"],false,"Pies a la anchura de los hombros, baja hasta donde la pelvis no se despega."],["Curl femoral sentado","3×10–15","2 min",["Curl femoral acostado"],false,"Cadera pegada, baja lento y estira completo."],["Abducción en máquina","3×12–20","90 s",["Abducción en polea"],false,"Torso un poco al frente, abre con control y regresa lento."],["Elevación de talones sentado","2×12–20","60 s",["Talones en prensa"],true,"Pausa abajo de un segundo, sin rebote."]]},{"d":"Jueves","n":"Torso B","e":[["Press inclinado con mancuernas","3×8–12","3 min",["Press inclinado en máquina"],false,"Banca a 30 grados, codos a 45, sin rebotar."],["Remo con pecho apoyado","3×8–12","2 a 3 min",["Remo en barra T","Remo en máquina"],false,"Pecho pegado, codos atrás."],["Elevación lateral en polea","3×12–20","2 min",["Elevación lateral con mancuerna"],false,"Cable por delante del cuerpo, sube hasta el hombro."],["Curl inclinado con mancuernas","3×10–15","90 s",["Curl con mancuernas de pie","Curl martillo"],false,"Banca a 45 o 60 grados, brazos detrás del cuerpo, baja completo."],["Extensión de tríceps con cuerda","3×10–15","90 s",["Fondos asistidos"],false,"Codos fijos, abre la cuerda al final."]]},{"d":"Viernes","n":"Pierna B","e":[["Peso muerto rumano","3×8–12","3 min",["Peso muerto rumano con mancuernas","Hiperextensión de glúteo"],false,"Cadera atrás, barra o mancuernas pegadas a las piernas, espalda neutra."],["Sentadilla búlgara","3×8–12","2 a 3 min",["Zancada en Smith","Prensa a una pierna"],false,"Torso un poco al frente, la rodilla sigue la punta del pie."],["Extensión de cuádriceps","3×12–15","2 min",["Sentadilla con talones elevados"],false,"Pausa arriba, baja lento."],["Elevación de talones de pie","3×10–15","90 s",["Talones en prensa"],false,"Pausa abajo, sube completo."],["Rueda abdominal","2×8–12","90 s",["Plancha con toque de hombro"],true,"Desde las rodillas, costillas abajo, regresa antes de arquear."]]}]},"avanzado":{"nivel":"Avanzado","para":"Más de 3 años entrenando, con números que ya no suben solos. Quieres prioridad en algún músculo.","promesa":"Prioridad clara, volumen al límite que puedes recuperar y una descarga planeada.","semanas":8,"descarga":4,"rpe":"8 a 9","cardio":"8,000 a 10,000 pasos. Zona 2 dos veces por semana; nunca el día antes de pierna.","dias":[{"d":"Lunes","n":"Torso empuje","e":[["Press inclinado con mancuernas","3×6–10","3 a 4 min",["Press inclinado en Smith"],false,"30 grados, no 45. Costillas abajo y espalda baja pegada."],["Press de pecho en máquina inclinada","3×8–12","3 min",["Cruce de poleas de abajo hacia arriba"],false,"Estira abajo, sin despegar los hombros."],["Elevación lateral en polea baja","3×12–20","2.5 min",["Elevación lateral con mancuerna"],false,"Cable cruzado por delante, sube hasta el hombro."],["Extensión de tríceps sobre la cabeza en polea","3×10–15","2 min",["Press francés con mancuerna"],false,"Estiramiento completo detrás de la cabeza."],["Elevación lateral con mancuerna","2×12–20","2 min",["Elevación lateral en máquina"],false,"Segunda dosis de lateral: misma técnica, sin trampa."],["Face pull","2×15–20","90 s",["Cruce inverso en polea"],true,"Abre al final y aprieta atrás."]]},{"d":"Martes","n":"Pierna cuádriceps","e":[["Sentadilla hack","3×6–10","3 a 4 min",["Sentadilla con barra","Prensa de piernas"],false,"Espalda pegada, baja profundo, empuja con todo el pie."],["Peso muerto rumano","3×8–10","3 min",["Peso muerto rumano con mancuernas"],false,"Cadera atrás, barra pegada, espalda neutra."],["Extensión de cuádriceps","3×12–20","2 min",["Sentadilla sissy asistida"],false,"Pausa arriba y baja en 3 segundos."],["Curl femoral sentado","3×10–15","2 min",["Curl femoral acostado"],false,"Inclínate un poco al frente para estirar más."],["Elevación de talones sentado","3×12–20","90 s",["Talones en prensa"],false,"Pausa de 2 s abajo."]]},{"d":"Miércoles","n":"Torso jalón","e":[["Jalón al pecho, agarre ancho","3×8–12","3 min",["Dominadas asistidas"],false,"Baja los hombros primero, codos a las costillas."],["Remo en barra T","3×8–12","3 min",["Remo con pecho apoyado"],false,"Pecho arriba, codos pegados, sin jalar con la espalda baja."],["Pullover en polea","3×10–15","2 min",["Jalón a un brazo"],false,"Codos casi fijos, tira desde el estiramiento de arriba."],["Cruce inverso en polea","3×15–20","90 s",["Pájaro en máquina"],false,"Brazos casi estirados, abre atrás."],["Curl inclinado con mancuernas","3×10–12","90 s",["Curl Bayesian en polea"],false,"Brazos detrás del cuerpo, baja completo."],["Paseo del granjero","2×40–60 s","2 min",["Sostén de barra"],true,"Hombros abajo, pasos cortos, sin inclinarte."]]},{"d":"Jueves","n":"Hombro y brazo","e":[["Elevación lateral tumbado en banca inclinada","3×12–20","2 min",["Elevación lateral en polea"],false,"De lado en banca a 30 grados, sube hasta la línea del hombro."],["Press inclinado en máquina","3×8–12","3 min",["Press inclinado con mancuernas"],false,"Ángulo bajo, codos a 45."],["Remo en polea sentado, agarre ancho","3×10–15","2 min",["Remo en máquina agarre ancho"],false,"Codos abiertos, jala hacia el pecho alto."],["Curl predicador en máquina","3×10–15","90 s",["Curl predicador con mancuerna"],false,"Baja hasta estirar completo, sin rebote."],["Jalón de tríceps con cuerda","3×10–15","90 s",["Extensión de tríceps con barra en polea"],false,"Codos pegados, abre la cuerda."],["Curl martillo con cuerda","2×10–15","90 s",["Curl martillo con mancuernas"],true,"Codos quietos, sube a la altura del hombro."]]},{"d":"Viernes","n":"Pierna cadera","e":[["Hip thrust en máquina","3×8–12","3 min",["Hip thrust con barra"],false,"Pausa arriba de 1 segundo, sin arquear."],["Zancadas caminando","3×10–12","2 a 3 min",["Sentadilla búlgara"],false,"Paso largo, torso un poco al frente."],["Abducción en máquina","3×15–25","90 s",["Abducción en polea"],false,"Torso al frente, regresa lento."],["Curl femoral acostado","3×10–15","2 min",["Curl femoral sentado"],false,"Cadera pegada al banco."],["Elevación de talones de pie","3×10–15","90 s",["Talones en prensa"],false,"Pausa de 2 s abajo, sin rebote."],["Rueda abdominal","2×8–12","90 s",["Plancha con peso"],true,"Costillas abajo, regresa antes de arquear."]]}]}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ── contacto: un solo lugar para cambiarlo ── */
+var WA = "523117408139", WA_TXT = "311 740 8139";
+var $ = function(s){ return document.querySelector(s); }, $$ = function(s){ return [].slice.call(document.querySelectorAll(s)); };
+function wa(msg){ return "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg); }
+var MSG0 = "Hola Dalí, vi tu página de MODO y quiero saber qué nivel me toca.";
+["#nav-wa", "#cierre-wa", "#fijo-wa"].forEach(function(s){ $(s).href = wa(MSG0); });
+$("#num-txt").textContent = WA_TXT;
+$("#copiar-num").addEventListener("click", function(){ var b = this; try{ navigator.clipboard.writeText(WA_TXT).then(function(){ b.textContent = "✅ Copiado"; }, function(){ b.textContent = WA_TXT; }); }catch(e){ b.textContent = WA_TXT; } });
+
+/* ── la barra del hero: los cinco discos de un día ── */
+var PL = [["var(--p25)",128],["var(--p20)",116],["var(--p15)",102],["var(--p10)",86],["var(--p5)",70]], svg = $("#barra"), o = '<rect x="0" y="66" width="600" height="8" rx="4" fill="#8A959E"/><rect x="176" y="58" width="10" height="24" rx="2" fill="#8A959E"/><rect x="414" y="58" width="10" height="24" rx="2" fill="#8A959E"/>';
+PL.forEach(function(p, n){ var xl = 156 - n * 22, xr = 426 + n * 22; [xl, xr].forEach(function(x, s){ o += '<rect class="pl pl-' + (s ? 'r' : 'l') + '" x="' + x + '" y="' + (70 - p[1] / 2) + '" width="18" height="' + p[1] + '" rx="5" fill="' + p[0] + '" stroke="#000" stroke-opacity=".25"/>'; }); });
+svg.innerHTML = o;
+
+/* ── problema: la respuesta entra con cada toque ── */
+var RESP = [
+  { h:"No es fuerza de voluntad, es una regla", p:["Si repites el mismo peso semanas, el cuerpo no tiene razón para cambiar. Si subes de más, se caen las repeticiones y te estancas.","<b>La app te dice el peso y las repeticiones de cada serie, cada día.</b> Cuando tocas el tope del rango, sube. Si no, una repetición más."] },
+  { h:"Una rutina de internet no sabe quién eres", p:["No sabe cuántos días puedes, qué máquinas tiene tu gym ni qué te molesta. Por eso la cambias cada mes y vuelves a empezar.","<b>Tu programa sale de tu nivel y tus días reales.</b> Y si un ejercicio no te gusta, lo cambias por una alternativa con un toque, sin perder tu registro."] },
+  { h:"Lo dejas porque no ves el avance", p:["El espejo tarda semanas en cambiar. Los números no: la fuerza sube desde la segunda semana.","<b>La app te enseña tu progreso cada sesión</b>, y cada viernes reviso tu semana. Saber que alguien la va a ver cambia todo."] }
+];
+function pintaResp(i){ var r = RESP[i]; $("#resp").innerHTML = '<h3>' + r.h + '</h3>' + r.p.map(function(x){ return '<p>' + x + '</p>'; }).join(""); $$("[data-m]").forEach(function(b){ b.setAttribute("aria-pressed", String(+b.dataset.m === i)); }); if(window.gsap && window.__motion !== "off") gsap.from("#resp > *", { opacity:0, y: window.__motion === "full" ? 14 : 0, duration:.45, stagger:.08, ease:"power2.out" }); }
+$$("[data-m]").forEach(function(b){ b.addEventListener("click", function(){ pintaResp(+b.dataset.m); }); });
+pintaResp(0);
+
+/* ── el regalo: la doble progresión ── */
+var RG = [8, 12];
+function veredicto(){
+  var r = ["#s1","#s2","#s3"].map(function(s){ return parseInt($(s).value, 10); }).filter(function(x){ return x > 0; }), lo = RG[0], hi = RG[1], v = $("#veredicto");
+  if(r.length < 3){ v.dataset.t = ""; v.innerHTML = '<b>Pon tus 3 series</b><span>Las repeticiones que te salieron, no las que querías.</span>'; return; }
+  var def = r.reduce(function(s, x){ return s + Math.max(0, lo - x); }, 0);
+  if(r.every(function(x){ return x >= hi; })){ v.dataset.t = "up"; v.innerHTML = '<b>Sube el peso</b><span>Las tres tocaron el tope (' + hi + '). Sube un escalón, de 2.5 a 5 kg, y vuelve a empezar cerca de ' + Math.round((lo + hi) / 2) + ' repeticiones.</span>'; }
+  else if(def >= 3){ v.dataset.t = "down"; v.innerHTML = '<b>Baja un escalón</b><span>Te faltaron ' + def + ' repeticiones para el rango. Con menos peso, las tres entran y progresas más rápido.</span>'; }
+  else { var n = r.map(function(x){ return Math.min(hi, x + 1); }); v.dataset.t = "keep"; v.innerHTML = '<b>Mismo peso, una más</b><span>La próxima vez busca ' + n.join(", ") + '. Cuando las tres lleguen a ' + hi + ', subes.</span>'; }
+}
+$$("#rangos button").forEach(function(b){ b.addEventListener("click", function(){ RG = b.dataset.r.split("-").map(Number); $$("#rangos button").forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); }); veredicto(); }); });
+["#s1","#s2","#s3"].forEach(function(s){ $(s).addEventListener("input", veredicto); });
+veredicto();
+
+/* ── los niveles: una sola fuente ── */
+var DEMO = { principiante:"demo-principiante.html", intermedio:"demo-intermedio.html", avanzado:"demo-avanzado.html" };
+/* El nivel define el programa; el plan define cuánto te acompaño (16 oct 2026). */
+var PLANES = [
+  { id:"app", k:"Para empezar solo", n:"App", precio:399, col:"var(--p10)", p:"Tu programa y tu app, sin revisión semanal.", inc:["Programa a tu nivel, nuevo cada 8 semanas","App completa: registro, retro al terminar, récords y logros","Alternativas y video por ejercicio","Guía de alimentación"] },
+  { id:"coaching", k:"El más elegido", n:"Coaching", precio:899, col:"var(--p20)", top:true, p:"Yo reviso tu semana y ajusto tu programa.", inc:["Todo lo de App","Retro semanal escrita cada viernes","Ajuste de cargas y ejercicios cada semana","Dudas por WhatsApp de lunes a viernes"] },
+  { id:"premium", k:"Acompañamiento cercano", n:"Premium", precio:1490, col:"var(--p25)", p:"Más contacto y revisión de tu técnica.", inc:["Todo lo de Coaching","Revisión de técnica por video cada 2 semanas","Videollamada mensual de 20 minutos","Check-in a media semana"] }
+];
+var NIV = {
+  principiante:{ n:"Principiante", col:"var(--p15)", p:"3 días de cuerpo completo para aprender los movimientos y subir cada semana." },
+  intermedio:{ n:"Intermedio", col:"var(--p20)", p:"4 días de torso y pierna para romper el estancamiento." },
+  avanzado:{ n:"Avanzado", col:"var(--p25)", p:"5 días con prioridad muscular y descarga planeada." }
+};
+var PER = 1;
+function pintaPlanes(){
+  $("#lista-niveles").innerHTML = PLANES.map(function(v){ var m = PER === 3 ? Math.round(v.precio * .9) : v.precio; return '<article class="nv' + (v.top ? ' top' : '') + '">' + (v.top ? '<span class="cinta">El más elegido</span>' : '') + '<span class="disco" style="background:' + v.col + '"></span><p class="k">' + v.k + '</p><h3>' + v.n + '</h3><p class="precio">$' + m.toLocaleString("es-MX") + ' <small>al mes</small></p>' + (PER === 3 ? '<p class="ahorro">$' + (m * 3).toLocaleString("es-MX") + ' cada 3 meses · ahorras $' + ((v.precio - m) * 3).toLocaleString("es-MX") + '</p>' : '') + '<p>' + v.p + '</p><ul>' + v.inc.map(function(x){ return '<li>' + x + '</li>'; }).join("") + '</ul><a class="btn ' + (v.top ? 'go' : 'line') + ' nv-cta" href="' + wa("Hola Dalí, me interesa el plan " + v.n + (PER === 3 ? " trimestral" : "") + " de MODO.") + '" target="_blank" rel="noopener">Quiero ' + v.n + '</a></article>'; }).join("");
+}
+pintaPlanes();
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-per]"); if(!b) return; PER = +b.dataset.per; document.querySelectorAll("[data-per]").forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); }); pintaPlanes(); });
+$("#lista-nivs").innerHTML = Object.keys(NIV).map(function(k){ var v = NIV[k]; return '<a class="niv" href="' + DEMO[k] + '" target="_blank" rel="noopener"><span class="d2" style="background:' + v.col + '"></span><span><b>' + v.n + ' →</b><span>' + v.p + '</span></span></a>'; }).join("");
+
+/* ── así sería tu plan: el programa base de cada nivel, como en la app ── */
+var BASES = JSON.parse(document.getElementById("bases").textContent), TP = { nv:"intermedio", d:0 }, DSEM = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+function pintaPlan(){
+  var B = BASES[TP.nv], dias = B.dias, dd = dias[TP.d] || dias[0];
+  $("#tp-niv").innerHTML = Object.keys(BASES).map(function(k){ return '<button type="button" role="tab" data-tpn="' + k + '" aria-selected="' + (k === TP.nv) + '"><i style="background:' + NIV[k].col + '"></i>' + BASES[k].nivel + '</button>'; }).join("");
+  var porDia = {}; dias.forEach(function(d, n){ porDia[d.d] = n; });
+  var h = '<div class="tp-head"><p class="mono" style="font-size:.8rem">Programa ' + B.nivel + '</p><h3>' + B.promesa + '</h3><p>' + B.para + '</p><div class="tp-stats"><span>' + dias.length + ' días por semana</span><span>' + B.semanas + ' semanas</span><span>Esfuerzo RPE ' + B.rpe + '</span>' + (B.descarga !== null ? '<span>Descarga en la semana ' + (B.descarga + 1) + '</span>' : '') + '</div></div>';
+  h += '<div class="tp-sem" role="tablist">' + DSEM.map(function(n){ var i = porDia[n], ent = i !== undefined; return '<button type="button"' + (ent ? ' class="ent" data-tpd="' + i + '" aria-selected="' + (i === TP.d) + '"' : ' disabled') + '><span>' + n.slice(0, 3) + '</span><b class="tpd-b">' + (ent ? dias[i].n.split(" ")[0] : '–') + '</b></button>'; }).join("") + '</div>';
+  h += '<div class="tp-dia"><h4>' + dd.d + ' · ' + dd.n + '</h4>' + dd.e.map(function(x, n){ return '<div class="tp-ex"><span class="n">' + (n + 1) + '</span><div><b>' + x[0] + (x[4] ? '<span class="op">si sobra tiempo</span>' : '') + '</b><p class="pr">' + x[1].replace("×", " series × ").replace("–", " a ") + ' reps · descanso ' + x[2] + '</p>' + (x[3].length ? '<p class="alt">¿No te gusta? ' + x[3].join(" o ") + '</p>' : '') + '<p class="tec">' + x[5] + '</p></div></div>'; }).join("") + '</div>';
+  h += '<div class="tp-pie"><a class="btn wa" href="' + wa("Hola Dalí, vi el plan " + B.nivel + " en tu página y lo quiero para mí.") + '" target="_blank" rel="noopener">Quiero este plan</a><a class="btn line" style="color:var(--ink)" href="' + DEMO[TP.nv] + '" target="_blank" rel="noopener">Verlo en la app</a></div>';
+  $("#tp").innerHTML = h;
+}
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-tpn],[data-tpd]"); if(!b) return; if(b.dataset.tpn){ TP.nv = b.dataset.tpn; TP.d = 0; } else TP.d = +b.dataset.tpd; pintaPlan(); });
+pintaPlan();
+
+/* ── demo automático en el teléfono del hero ── */
+(function(){
+  var imgs = [].slice.call(document.querySelectorAll("#demo-tel img")), cap = $("#demo-cap b"), CAPS = ["Tu día en una barra","Modo gym: serie por serie","Qué levantar hoy","Tu retro al terminar","Tus récords, solitos","Logros y racha","Comer para entrenar"], n = 0, vis = true;
+  if(window.IntersectionObserver) new IntersectionObserver(function(es){ vis = es[0].isIntersecting; }).observe($("#demo-tel"));
+  setInterval(function(){ if(!vis || document.hidden) return; imgs[n].classList.remove("on"); n = (n + 1) % imgs.length; imgs[n].classList.add("on"); cap.textContent = CAPS[n]; }, window.__motion === "full" ? 3200 : 4500);
+})();
+
+/* ── el quiz: el dato se pide al final, con contexto ── */
+var Q = [
+  { k:"tiempo", p:"¿Cuánto llevas entrenando con constancia?", o:["Menos de 1 año","1 a 3 años","Más de 3 años"] },
+  { k:"dias", p:"¿Cuántos días a la semana puedes ir de verdad?", o:["3","4","5 o más"] },
+  { k:"meta", p:"¿Qué quieres que cambie en 3 meses?", o:["Más fuerza","Más músculo","Bajar grasa","Sentirme con energía"] },
+  { k:"dolor", p:"¿Algo te duele o tienes alguna lesión?", o:["Nada","Sí, algo leve","Sí, me preocupa"] }
+], R = {};
+function pintaQuiz(){
+  var h = Q.map(function(q){ return '<div class="q"><p>' + q.p + '</p><div class="ops">' + q.o.map(function(x){ return '<button type="button" data-q="' + q.k + '" data-v="' + x + '" aria-pressed="' + (R[q.k] === x) + '">' + x + '</button>'; }).join("") + '</div></div>'; }).join("");
+  var listo = Q.every(function(q){ return R[q.k]; });
+  if(listo){
+    var nv = R.tiempo === "Menos de 1 año" || R.dias === "3" ? "principiante" : (R.tiempo === "Más de 3 años" && R.dias === "5 o más" ? "avanzado" : "intermedio"), v = NIV[nv], pl = R.dolor === "Sí, me preocupa" ? "Premium" : "Coaching";
+    var msg = "Hola Dalí, hice el test de MODO. Me salió nivel " + v.n + ".\nEntreno desde: " + R.tiempo + "\nDías: " + R.dias + "\nQuiero: " + R.meta + "\nMolestias: " + R.dolor;
+    h += '<div class="resultado" id="res"><span class="mono" style="font-size:.85rem;color:var(--ink2)">Tu nivel</span><b>' + v.n + '</b><p>' + v.p + ' Para empezar te recomiendo el plan <b>' + pl + '</b>' + (pl === "Premium" ? ': con esa molestia conviene que revise tu técnica en video. Antes de arrancar la revisamos con calma, tu salud va primero.' : ': reviso tu semana cada viernes.') + '</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn wa" href="' + wa(msg) + '" target="_blank" rel="noopener">Mandármelo por WhatsApp</a><a class="btn line" href="#tuplan" data-verplan="' + nv + '" style="color:var(--ink)">Ver mi plan ' + v.n + '</a></div></div>';
+  }
+  $("#quiz").innerHTML = h;
+}
+document.addEventListener("click", function(e){ var vp = e.target.closest("[data-verplan]"); if(vp){ TP.nv = vp.dataset.verplan; TP.d = 0; pintaPlan(); } });
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-q]"); if(!b) return; R[b.dataset.q] = b.dataset.v; pintaQuiz(); var r = document.getElementById("res"); if(r && Q.every(function(q){ return R[q.k]; }) && b.dataset.q === "dolor") r.scrollIntoView({ behavior: window.__motion === "full" ? "smooth" : "auto", block:"center" }); });
+pintaQuiz();
+
+/* ── CTA fijo: aparece hasta después del hero; un listener pasivo con rAF, lee y luego escribe ── */
+var hero = $(".hero"), quiz = $("#nivel"), cierre = $("#cierre"), st = {}, tick = false;
+function lee(){ st.past = hero.getBoundingClientRect().bottom < innerHeight * .25; var a = quiz.getBoundingClientRect(), c = cierre.getBoundingClientRect(); st.at = (a.top < innerHeight * .8 && a.bottom > 0) || (c.top < innerHeight * .9); }
+function escribe(){ document.body.classList.toggle("past-hero", st.past); document.body.classList.toggle("at-cta", st.at); }
+addEventListener("scroll", function(){ if(tick) return; tick = true; requestAnimationFrame(function(){ lee(); escribe(); tick = false; }); }, { passive:true });
+lee(); escribe();
+
+/* ── movimiento (diseno-web): full / soft / off ── */
+var M = window.__motion, G = window.gsap, ST = window.ScrollTrigger;
+if(window.__osReduce && M === "soft"){ var ab = $("#anim-btn"); ab.hidden = false; ab.addEventListener("click", function(){ try{ localStorage.setItem("anim", "full"); }catch(e){} location.reload(); }); }
+if(G && ST && M !== "off"){
+  G.registerPlugin(ST);
+  var full = M === "full";
+  // hero: el título y luego los discos se cargan en la barra, de adentro hacia afuera
+  G.from(".h-in", { opacity:0, y: full ? 26 : 0, duration:.7, stagger:.1, ease:"power3.out" });
+  G.from(".telefono", { opacity:0, y: full ? 40 : 0, rotate: full ? -10 : -4, duration:.9, ease:"power3.out", delay:.15 });
+  G.from(".pl-l", { x: full ? -90 : 0, opacity:0, duration:.55, stagger:.09, ease:"back.out(1.6)", delay:.5 });
+  G.from(".pl-r", { x: full ? 90 : 0, opacity:0, duration:.55, stagger:.09, ease:"back.out(1.6)", delay:.5 });
+  if(full) G.to(".telefono", { y:-10, duration:2.6, yoyo:true, repeat:-1, ease:"sine.inOut", delay:1.2 });
+  // frases de capítulo: palabra por palabra, ligadas al scroll
+  $$("[data-frase] p").forEach(function(p){
+    var html = p.innerHTML.split(/(<em>.*?<\/em>|\s+)/).map(function(t){ if(!t || /^\s+$/.test(t)) return t; if(t.indexOf("<em>") === 0) return '<em class="w">' + t.slice(4, -5) + '</em>'; return '<span class="w">' + t + '</span>'; }).join("");
+    p.innerHTML = html;
+    G.from(p.querySelectorAll(".w"), { opacity:.12, rotateX: full ? -70 : 0, y: full ? 20 : 0, stagger:.08, ease:"none", scrollTrigger:{ trigger:p, start:"top 85%", end:"bottom 45%", scrub:.7 } });
+  });
+  // entradas: solo lo que está abajo del pliegue al cargar
+  ST.batch(".nv,.respuesta,.calc,.carril figure,.pasos li,.ficha,.quiz,.faq details,.bt,.vs-c,.tp", { start:"top 88%", once:true, onEnter:function(b){ G.from(b, { opacity:0, y: full ? 40 : 0, rotateX: full ? 14 : 0, duration:.7, stagger:.08, ease:"power3.out", overwrite:true }); } });
+  // prueba: las barras se llenan y los números cuentan
+  G.from(".lift .b", { scaleX:0, duration:1.1, stagger:.15, ease:"power3.out", scrollTrigger:{ trigger:"#lifts", start:"top 80%", once:true } });
+  $$("[data-cuenta]").forEach(function(el){ var fin = +el.dataset.cuenta, txt = el.textContent, o2 = { v:0 }; ST.create({ trigger:el, start:"top 90%", once:true, onEnter:function(){ G.to(o2, { v:fin, duration:1.2, ease:"power2.out", onUpdate:function(){ el.textContent = txt.replace(String(fin), Math.round(o2.v)); }, onComplete:function(){ el.textContent = txt; } }); } }); });
+  // los pasos se conectan
+  if(full) G.from("#riel", { scaleX:0, ease:"none", scrollTrigger:{ trigger:".pasos", start:"top 80%", end:"bottom 60%", scrub:.6 } });
+}
+// carrusel 3D en celular: giro por distancia al centro (solo full)
+var car = $("#carril");
+function giro(){ if(M !== "full" || innerWidth > 1100) return; var c = car.getBoundingClientRect(), mid = c.left + c.width / 2; $$("#carril .pant").forEach(function(p){ var r = p.getBoundingClientRect(), d = ((r.left + r.width / 2) - mid) / c.width; p.style.setProperty("--ry", (d * -28).toFixed(1) + "deg"); p.style.setProperty("--sc", (1 - Math.min(.12, Math.abs(d) * .16)).toFixed(3)); }); }
+car.addEventListener("scroll", function(){ requestAnimationFrame(giro); }, { passive:true }); giro();
+
+/* ── #diag: el diagnóstico del celular de un prospecto ── */
+if(location.hash === "#diag"){ var d = document.createElement("div"); d.id = "diag"; d.textContent = "modo: " + M + "\nreducir movimiento: " + (window.__osReduce ? "sí" : "no") + "\nequipo modesto: " + (window.__lowfx ? "sí" : "no") + "\ngsap: " + (!!G) + "\npantalla: " + innerWidth + "×" + innerHeight + "\nerrores: " + JSON.stringify(window.__errs); document.body.appendChild(d); }
+})();
+</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})});</script></body></html>
