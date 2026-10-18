@@ -762,6 +762,14 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 .aj-grupo{display:grid;gap:12px;border-top:1px solid var(--line);padding-top:12px}
 .colores button{display:inline-flex;align-items:center;gap:6px} .colores i{width:14px;height:14px;border-radius:50%;display:inline-block}
 
+/* más ligera (18 oct 2026): lo secundario plegado */
+.aj-d{border-top:1px solid var(--line)} .aj-d>summary{min-height:48px;font:700 .95rem/1.2 var(--display)}
+.aj-in{display:grid;gap:12px;padding-bottom:12px}
+.extra-r{margin-top:12px;border-top:1px dashed var(--line)} .extra-r>summary{min-height:42px;font:600 .88rem/1.2 var(--body);color:var(--ink2)}
+.coach-v[data-tono="retro"] .bub p:not(.lbl){display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.retro-acc .btn.ghost{border-color:transparent;color:var(--ink2)}
+.r3 li{line-height:1.45}
+
 </style>
 <div class="wrap">
   <header class="top">
@@ -941,9 +949,9 @@ function analizar(i, w){
 function lineasRetro(i, w){
   var R = analizar(i, w); if(!R.hechos) return null;
   var pct = R.nSer ? Math.round(R.en / R.nSer * 100) : 0;
-  var bien = R.bien.length ? R.bien.slice(0, 2).map(function(b){ return b.t; }).join(" · ") : (pct === 100 ? "Las " + R.nSer + " series dentro del rango." : R.en + " de " + R.nSer + " series dentro del rango.");
+  var bien = R.bien.length ? R.bien.slice(0, 1).map(function(b){ return b.t; }).join(" · ") : (pct === 100 ? "Las " + R.nSer + " series dentro del rango." : R.en + " de " + R.nSer + " series dentro del rango.");
   var fix = R.hall.length ? R.hall[0].t : "Nada que corregir hoy.";
-  if(R.sin.length) fix += "<br>Sin anotar: " + esc(R.sin.join(", ")) + ".";
+  if(R.sin.length) fix += '<br><span class="tiny">Sin anotar: ' + R.sin.length + (R.sin.length === 1 ? ' ejercicio' : ' ejercicios') + '.</span>';
   var nx = [];
   if(R.sube.length) nx.push("Sube: " + esc(R.sube.join(" · ")) + ".");
   if(R.baja.length) nx.push("Baja un escalón: " + esc(R.baja.join(", ")) + ".");
@@ -1042,7 +1050,7 @@ function vHoy(){
     '<div class="score"><b data-cuenta="' + sc.total + '">' + sc.total + '</b><span>puntos de hoy ' + infoBtn("puntos") + '<br>' + frase + '</span></div>' +
     '<div class="pilares">' + DISCOS.map(function(d){ var v = sc.parts[d.k]; return '<button type="button" class="pilar" data-ir="' + d.k + '" data-s="' + (v >= .9 ? 'full' : v > 0 ? 'half' : 'none') + '"><span class="i" style="color:' + d.col + '">' + ic(d.ico, 20) + '</span><span class="n">' + d.n + '</span><span class="v">' + esc(sc.val[d.k]) + '</span></button>'; }).join("") + '</div></section>';
   h += coachHTML();
-  if(SEM_REAL > 0 || dowL(HOY) >= 4){ var wR = dowL(HOY) >= 4 ? SEM_HOY : Math.max(0, SEM_HOY - 1); h += '<button type="button" class="btn wide resumen-btn" data-semdet="' + wR + '">📋 Mi semana ' + (wR + 1) + ' en resumen</button>'; }
+  if(!retroPendiente() && (SEM_REAL > 0 || dowL(HOY) >= 4)){ var wR = dowL(HOY) >= 4 ? SEM_HOY : Math.max(0, SEM_HOY - 1); h += '<button type="button" class="btn wide resumen-btn" data-semdet="' + wR + '">📋 Mi semana ' + (wR + 1) + ' en resumen</button>'; }
   // lo que toca
   h += '<section class="card"><div class="hd"><h2>' + ic("diana", 18) + ' Lo que toca hoy</h2></div><div class="stack">';
   if(i >= 0 && SEM_REAL >= 0 && SEM_REAL < NSEM){
@@ -1170,9 +1178,9 @@ function retroHTML(i, entra){
   else h += '<div class="ring">' + anillo(L.pct) + '<div><b>' + L.R.en + '/' + L.R.nSer + '</b> <span class="sub">series en rango' + (L.delta !== null ? '<br>' + (L.delta >= 0 ? '+' : '') + L.delta + ' % de carga contra la semana ' + (L.R.wa + 1) : '') + '</span></div></div>' +
     '<ul class="r3"><li class="ok"><span class="lb">Bien</span>' + L.bien + '</li><li class="fix"><span class="lb">Corrige</span>' + L.fix + '</li><li class="next"><span class="lb">Próxima vez</span>' + L.next + '</li></ul>';
   if(coach) h += '<div class="coachbox" style="margin-top:10px"><span class="lbl">Del coach</span>' + coach + '</div>';
-  h += '<div style="margin-top:12px"><p class="tiny" style="margin-bottom:6px">¿Algo molestó entrenando?</p><div class="chips" data-smol="' + p + '">' + ["Nada","Hombro","Aquiles o rodilla","Espalda baja","Otra"].map(function(m){ return '<button type="button" data-v="' + m + '" aria-pressed="' + (m === mol) + '">' + m + '</button>'; }).join("") + '</div>' +
+  h += '<details class="extra-r"' + (mol && mol !== "Nada" || get(p + "nota") ? ' open' : '') + '><summary>¿Algo molestó o quieres dejarme una nota?</summary><div style="margin-top:4px"><p class="tiny" style="margin-bottom:6px">¿Algo molestó entrenando?</p><div class="chips" data-smol="' + p + '">' + ["Nada","Hombro","Aquiles o rodilla","Espalda baja","Otra"].map(function(m){ return '<button type="button" data-v="' + m + '" aria-pressed="' + (m === mol) + '">' + m + '</button>'; }).join("") + '</div>' +
     (mol && mol !== "Nada" ? '<div class="alerta">Hoy cero fallo en esa zona y no subas peso ahí. Si es 4 de 10 o más, escríbeme hoy.</div>' : '') +
-    '<input type="text" id="' + p + 'nota" data-snota="' + p + 'nota" placeholder="¿Algo que deba saber? (opcional)" value="' + esc(get(p + "nota") || "") + '" style="margin-top:8px"></div>' +
+    '<input type="text" id="' + p + 'nota" data-snota="' + p + 'nota" placeholder="¿Algo que deba saber? (opcional)" value="' + esc(get(p + "nota") || "") + '" style="margin-top:8px"></div></details>' +
     '<div class="row" style="margin-top:12px"><button type="button" class="btn" data-copiar="dia">Copiar para el chat</button><span class="tiny" data-copiado></span></div><textarea class="out" readonly aria-label="Resumen para copiar"></textarea></section>';
   return h;
 }
@@ -1501,7 +1509,9 @@ function nInforme(){
 }
 function textoSesion(i, w){
   var L = ["SESIÓN · " + DSEM[dowDe(i)] + " " + corta(fechaDe(w, i)) + " · semana " + (w + 1) + " · " + DIAS[i].n];
-  ejerciciosDe(i, w).forEach(function(x, k){ var s = seriesDe(w, i, k, x[1]); L.push((k + 1) + ". " + corto(x) + ": " + (s.length ? s.map(function(z){ return (z.w ? z.w + " × " : "") + z.r; }).join(" · ") : "(sin anotar)")); });
+  var sinA = [];
+  ejerciciosDe(i, w).forEach(function(x, k){ var s = seriesDe(w, i, k, x[1]); if(!s.length){ sinA.push(corto(x)); return; } var pw = s.every(function(z){ return z.w === s[0].w; }); L.push("• " + corto(x) + ": " + (pw && s[0].w ? s[0].w + " × " + s.map(function(z){ return z.r; }).join(", ") : s.map(function(z){ return (z.w ? z.w + "×" : "") + z.r; }).join(", "))); });
+  if(sinA.length) L.push("Sin anotar: " + sinA.join(", "));
   var R = lineasRetro(i, w), p = "w" + w + "-d" + i + "-";
   function pl(t){ return String(t).replace(/<br>/g, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"); }
   if(R) L.push("", "Retro: " + R.R.en + "/" + R.R.nSer + " en rango.", "Bien: " + pl(R.bien), "Corrige: " + pl(R.fix), "Próxima: " + pl(R.next));
@@ -1520,21 +1530,26 @@ function hojaAjustes(){
   var t = get("tema") || "system", s = '<div class="sheet" id="sheet"><div class="in" role="dialog" aria-label="Ajustes"><div class="hd"><h2 class="t-sec">Ajustes</h2><button type="button" class="icbtn" data-cerrar aria-label="Cerrar">✕</button></div>' +
     '<div><span class="lbl">Unidad de peso</span><div class="chips" style="margin-top:6px" data-uni>' + ["kg","lb"].map(function(u){ return '<button type="button" data-v="' + u + '" aria-pressed="' + (UNI === u) + '">' + u + '</button>'; }).join("") + '</div><p class="tiny" style="margin-top:6px">' + esc(CFG.convencion || "Mancuerna: el peso de una. Barra: con la barra incluida.") + '</p></div>' +
     '<div><span class="lbl">Tema</span><div class="chips" style="margin-top:6px" data-tema>' + [["system","Automático"],["light","Claro"],["dark","Oscuro"]].map(function(x){ return '<button type="button" data-v="' + x[0] + '" aria-pressed="' + (t === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div>' +
+    '<details class="aj-d"><summary>Avanzado</summary><div class="aj-in">' +
     '<div><span class="lbl">Anotar en otra semana</span><div class="chips" style="margin-top:6px">' + Array.apply(null, Array(NSEM)).map(function(_, w){ return '<button type="button" data-semana="' + w + '" aria-pressed="' + (w === WK) + '">' + (w + 1) + '</button>'; }).join("") + '</div><p class="tiny" style="margin-top:6px">Solo para pasar una sesión atrasada. Al volver a abrir, regresa a la semana de hoy.</p></div>' +
     '<div><span class="lbl">Descanso automático al anotar las reps</span><div class="chips" style="margin-top:6px">' + [["1","Sí"],["0","No"]].map(function(x){ return '<button type="button" data-adesc data-v="' + x[0] + '" aria-pressed="' + ((get("autoDesc") || "1") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div>' +
-    '<div class="aj-grupo"><p class="lbl" style="color:var(--acc)">Hazla tuya</p>' +
+    '</div></details>' +
+    '<details class="aj-d"><summary>🎨 Hazla tuya</summary><div class="aj-in">' +
       '<div><span class="lbl">Color de tu app</span><div class="chips colores" style="margin-top:6px">' + Object.keys(ACENTOS).map(function(k){ return '<button type="button" data-acento="' + k + '" aria-pressed="' + ((get("acento") || "modo") === k) + '"><i style="background:' + ACENTOS[k][1] + '"></i>' + ACENTOS[k][0] + '</button>'; }).join("") + '</div></div>' +
       '<label class="f"><span>¿Cómo te digo?</span><input type="text" id="aj-apodo" maxlength="24" value="' + esc(get("apodo") || "") + '" placeholder="' + esc(CFG.nombre) + '"></label>' +
       '<label class="f"><span>Tu frase (sale en Hoy cada día)</span><input type="text" id="aj-frase" maxlength="90" value="' + esc(get("frase") || "") + '" placeholder="Ej. Disciplina > motivación"></label>' +
-      '<div><span class="lbl">Tamaño de letra</span><div class="chips" style="margin-top:6px">' + [["n","Normal"],["g","Grande"]].map(function(x){ return '<button type="button" data-letra="' + x[0] + '" aria-pressed="' + ((get("letra") || "n") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div></div>' +
-    '<div class="aj-grupo"><p class="lbl" style="color:var(--acc)">Automático</p>' +
+      '<div><span class="lbl">Tamaño de letra</span><div class="chips" style="margin-top:6px">' + [["n","Normal"],["g","Grande"]].map(function(x){ return '<button type="button" data-letra="' + x[0] + '" aria-pressed="' + ((get("letra") || "n") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div></div></details>' +
+    '<details class="aj-d"><summary>⚡ Automático</summary><div class="aj-in">' +
       '<div><span class="lbl">Abrir mi resumen solo cuando llegue la retro del viernes</span><div class="chips" style="margin-top:6px">' + [["1","Sí"],["0","No"]].map(function(x){ return '<button type="button" data-autores="' + x[0] + '" aria-pressed="' + ((get("autores") || "1") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div>' +
       '<label class="f"><span>¿A qué hora entrenas?</span><input type="time" id="aj-hora" value="' + esc(get("hora-entreno") || CFG.horaEntreno || "18:00") + '"></label>' +
-      '<button type="button" class="btn" data-ics>📅 Poner mis entrenos en el calendario del cel</button><p class="tiny">Cada día de entreno con aviso 30 minutos antes, hasta que termine tu bloque.</p></div>' +
+      '<button type="button" class="btn" data-ics>📅 Poner mis entrenos en el calendario del cel</button><p class="tiny">Cada día de entreno con aviso 30 minutos antes, hasta que termine tu bloque.</p></div></details>' +
     (CFG.demo ? '<button type="button" class="btn" data-reinicia>Reiniciar el demo</button>' : '') +
     '<p class="tiny">' + esc(CFG.pie || "") + '</p></div></div>';
   document.body.insertAdjacentHTML("beforeend", s);
+  if(AJ_OPEN) document.querySelectorAll("#sheet .aj-d").forEach(function(d){ if(d.querySelector("summary").textContent === AJ_OPEN) d.open = true; });
 }
+var AJ_OPEN = null; // el grupo de Ajustes que estaba abierto sigue abierto al re-pintar
+document.addEventListener("toggle", function(e){ var d = e.target; if(d && d.classList && d.classList.contains("aj-d")) AJ_OPEN = d.open ? d.querySelector("summary").textContent : (AJ_OPEN === d.querySelector("summary").textContent ? null : AJ_OPEN); }, true);
 
 /* ══════════════════════════════ VIDA (v6 · 16 oct 2026) ═════════════════════
    «La app se me hace muy sosa: más dinamismo, más info, práctica pero no sosa.»
@@ -2287,7 +2302,8 @@ function mensajeCoach(){
 }
 function coachHTML(){
   var foto = CFG.coachFoto, rs = retroPendiente();
-  if(rs) return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + textoCoach(rs.t) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Ver mi semana en resumen</button><button type="button" class="btn" data-leida="' + esc(rs.f) + '">Listo, la leí ✓</button></div></div></section>';
+  if(rs){ var p1 = String(rs.t).split(/\n+/).filter(function(x){ return x.trim(); })[0] || "";
+    return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + esc(p1) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Leer mi retro completa</button><button type="button" class="btn ghost sm" data-leida="' + esc(rs.f) + '">Ya la leí</button></div></div></section>'; }
   var m = mensajeCoach();
   return '<section class="coach-v" data-tono="' + m.tono + '"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu coach · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + m.t + '</p></div></section>';
 }
