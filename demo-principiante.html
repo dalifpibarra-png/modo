@@ -770,6 +770,36 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 .retro-acc .btn.ghost{border-color:transparent;color:var(--ink2)}
 .r3 li{line-height:1.45}
 
+/* mi semana · historia más bonita en cel y laptop (18 oct 2026) */
+.sp-hero{position:relative;overflow:hidden;padding:26px 16px 20px;background:radial-gradient(120% 90% at 50% 0%,var(--acc-w),var(--card) 70%)}
+.sp-hero>*{position:relative}
+.sp-numw{position:absolute!important;right:-6px;top:-34px;font:900 9.5rem/1 var(--display);color:var(--acc);opacity:.09;letter-spacing:-.06em;pointer-events:none}
+.sp-lead{margin:0 auto;max-width:34ch;color:var(--ink2);font-size:1rem;line-height:1.45;text-wrap:balance}
+.sp-capn{margin:6px 0 0;font:800 .72rem/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.sp-frase{margin:2px 0 4px;font:800 clamp(1.25rem,5vw,1.7rem)/1.15 var(--display);color:var(--ink);text-wrap:balance}
+.sp-sec h2{font-size:.98rem;color:var(--ink2)}
+.sp-fin{display:grid;justify-items:center;text-align:center;gap:10px;padding:26px 16px;border-radius:22px;background:linear-gradient(180deg,var(--card),var(--acc-w));border:1px solid var(--line)}
+.sp-fin h2{font:900 clamp(1.3rem,5vw,1.7rem)/1.15 var(--display);margin:0;text-wrap:balance}
+.sp-fin p{margin:0;color:var(--ink2);max-width:34ch}
+.sp-fin .av img,.sp-fin .av b{width:64px;height:64px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--acc);color:var(--acc-ink);font-weight:900;box-shadow:0 0 0 3px var(--card),0 0 0 6px var(--acc)}
+.sp-card{transition:transform .25s ease} .sp-card:active{transform:scale(.98)}
+.semp-cap button{transition:background .2s,color .2s,transform .2s} .semp-cap button[aria-current]{transform:translateY(-1px)}
+@media (min-width:900px){
+  .semp-in{max-width:68rem;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:22px;row-gap:26px;padding-top:22px}
+  .sp-hero,.sp-fin,#sp-dia,#sp-mejor,#sp-prox,.sp-pie{grid-column:1/-1}
+  .sp-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:center;text-align:left;padding:34px 34px 28px;column-gap:28px}
+  .sp-hero .lbl,.sp-hero h1,.sp-hero .sp-lead,.sp-hero .btn,.sp-hero .sp-top{grid-column:1} .sp-hero .sp-kpis{grid-column:2;grid-row:1/span 5}
+  .sp-hero h1{font-size:2.6rem} .sp-hero .sp-lead{margin:0} .sp-hero .btn{justify-self:start}
+  .sp-numw{font-size:15rem;top:-60px;right:10px}
+  .sp-k svg{width:96px;height:96px} .sp-k b{top:34px;font-size:1.6rem} .sp-k span{font-size:.82rem}
+  .sp-carr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible;margin:0;padding:0}
+  .sp-card{max-width:none}
+  #sp-prox{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start} #sp-prox>.sp-capn,#sp-prox>.sp-frase,#sp-prox>h2{grid-column:1/-1}
+  .sp-diab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} .sp-diab>p{grid-column:1/-1}
+  .semp-cap{justify-content:center}
+  .sp-carr+.tiny{display:none}
+}
+
 </style>
 <div class="wrap">
   <header class="top">
@@ -2835,17 +2865,18 @@ function semanaDetalleHTML(w){
     '<header class="semp-top"><button type="button" class="icbtn" data-cerrar aria-label="Cerrar">✕</button><div class="semp-tt"><b>Semana ' + (w + 1) + '</b><span>' + fechaSem(w) + '</span></div><div class="semp-nav"><button type="button" class="icbtn" data-semdet="' + (w - 1) + '"' + (w <= 0 ? ' disabled' : '') + ' aria-label="Semana anterior">‹</button><button type="button" class="icbtn" data-semdet="' + (w + 1) + '"' + (w >= SEM_REAL || w >= NSEM - 1 ? ' disabled' : '') + ' aria-label="Semana siguiente">›</button></div></header>' +
     '<nav class="semp-cap" aria-label="Capítulos">' + caps.map(function(c, n){ return '<button type="button" data-salta="' + c[0] + '"' + (n === 0 ? ' aria-current="true"' : '') + '>' + c[1] + '</button>'; }).join("") + '</nav>' +
     '<div class="semp-in">' +
-    '<section class="sp-hero"><p class="lbl">Tu semana en resumen</p><h1>¡Así te fue, ' + nom + '!</h1><div class="sp-kpis">' +
+    '<section class="sp-hero"><span class="sp-numw" aria-hidden="true">' + (w + 1) + '</span><p class="lbl">Tu semana ' + (w + 1) + ' en resumen</p><h1>¡Así te fue, ' + nom + '!</h1><p class="sp-lead">' + (D.hechas >= DIAS.length ? 'Semana redonda: no fallaste ni un día. Esta es tu historia de la semana.' : D.hechas ? 'Entrenaste ' + D.hechas + ' de ' + DIAS.length + ' días. Esto es lo que pasó y lo que sigue.' : 'Esta semana no hubo entrenos anotados. Empecemos de nuevo, juntos.') + '</p><div class="sp-kpis">' +
       kpi(D.hechas, DIAS.length, 'días entrenados', 'var(--ok)') + kpi(D.ups.length, Math.max(1, D.ups.length + D.T.eq + D.T.down), 'ejercicios que subieron', 'var(--acc)') + kpi(D.pr === null ? 0 : D.pr, 100, '% series en tu meta', 'var(--plate15)') +
     '</div>' + (D.top && D.top.pct > 0 ? '<p class="sp-top">🏆 Tu mejor avance: <b>' + esc(D.top.n) + '</b> (+' + D.top.pct + ' % de fuerza)</p>' : '') +
     '<button type="button" class="btn sm" data-historias="' + w + '">▶ Verla como historia</button></section>' +
     (coach ? '<section class="sp-sec rv" id="sp-coach"><div class="sp-coach"><span class="av">' + (foto ? '<img src="' + foto + '" alt="" width="44" height="44">' : '<b>D</b>') + '</span><div class="bub"><p class="lbl">Tu coach · ' + esc(corta(deIso(coach.f))) + '</p>' + parr.slice(0, 2).map(function(p){ return '<p>' + esc(p) + '</p>'; }).join("") + (parr.length > 2 ? '<details><summary>Leer todo el mensaje</summary>' + parr.slice(2).map(function(p){ return '<p>' + esc(p) + '</p>'; }).join("") + '</details>' : '') + '</div></div></section>' : '') +
-    '<section class="sp-sec rv" id="sp-puntos"><h2>💬 Tu semana en puntos</h2><ul class="sp-pts">' + D.P.map(function(q){ return '<li><span class="em">' + q[0] + '</span><span>' + q[1] + '</span></li>'; }).join("") + '</ul></section>' +
-    '<section class="sp-sec rv" id="sp-mejor"><h2>🔥 Lo hiciste increíble</h2>' + (D.ups.length ? '<div class="sp-carr">' + D.ups.slice(0, 10).map(function(u){ return '<div class="sp-card"><b>' + esc(u.n) + '</b><span class="pill ok">+' + u.pct + ' %</span><p class="tiny">Semana ' + u.sem + '</p><p class="num">' + esc(u.de) + '</p><p class="flecha">↓</p><p class="tiny">Esta semana</p><p class="num fuerte">' + esc(u.a) + '</p></div>'; }).join("") + '</div><p class="tiny">Desliza para ver más →</p>' : '<p>Esta semana nada subió todavía. Mismo peso y una rep más: así empieza.</p>') + '</section>' +
-    '<section class="sp-sec rv" id="sp-mejorar"><h2>🔧 Hay que mejorar</h2>' + (D.bajo.length || D.faltan.length ? '<ul class="sp-lst">' + D.bajo.slice(0, 6).map(function(b){ return '<li><b>' + esc(b.n) + '</b>: ' + esc(b.nota || "bajó contra la semana pasada; repite el peso con descanso completo.") + '</li>'; }).join("") + (D.faltan.length ? '<li><b>Sin anotar</b>: ' + esc(D.faltan.join(", ")) + '.</li>' : '') + '</ul>' : '<p>Nada que corregir esta semana. ¡Así se hace!</p>') + '</section>' +
-    '<section class="sp-sec rv" id="sp-prox"><h2>➡️ Tu próxima semana</h2>' + D.dias.map(function(d){ var rr = d.rows.filter(function(r){ return r.ob; }); if(!rr.length) return ''; return '<div class="sp-pd"><p class="lbl">' + esc(DIAS[d.i].n) + '</p>' + rr.map(function(r){ return '<div class="sp-meta"><span>' + esc(corto(r.x)) + '</span><b class="num">' + esc(limpiaTxt(r.ob.hit)) + '</b></div>'; }).join("") + '</div>'; }).join("") + '</section>' +
-    '<section class="sp-sec rv" id="sp-dia"><h2>📅 Día por día</h2><div class="chips sp-dias">' + D.dias.map(function(d, n){ return '<button type="button" data-spdia="' + n + '" aria-pressed="' + (n === 0) + '">' + DSEM[dowDe(d.i)].slice(0, 3) + (d.hecho ? ' ✓' : '') + '</button>'; }).join("") + '</div><div class="sp-diab"></div></section>' +
-    '<section class="sp-sec rv" id="sp-tips"><h2>💡 Para mejorar cada semana</h2><ol class="sp-lst">' + D.R.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ol></section>' +
+    '<section class="sp-sec rv" id="sp-puntos"><p class="sp-capn">Capítulo 1</p><p class="sp-frase">' + (D.hechas >= DIAS.length ? 'La constancia ya es tuya.' : 'Cada día que vas, sumas.') + '</p><h2>💬 Tu semana en puntos</h2><ul class="sp-pts">' + D.P.map(function(q){ return '<li><span class="em">' + q[0] + '</span><span>' + q[1] + '</span></li>'; }).join("") + '</ul></section>' +
+    '<section class="sp-sec rv" id="sp-mejor"><p class="sp-capn">Capítulo 2</p><p class="sp-frase">' + (D.ups.length ? 'Aquí se nota el trabajo: ' + D.ups.length + (D.ups.length === 1 ? ' ejercicio arriba.' : ' ejercicios arriba.') : 'El progreso empieza con una rep más.') + '</p><h2>🔥 Lo hiciste increíble</h2>' + (D.ups.length ? '<div class="sp-carr">' + D.ups.slice(0, 10).map(function(u){ return '<div class="sp-card"><b>' + esc(u.n) + '</b><span class="pill ok">+' + u.pct + ' %</span><p class="tiny">Semana ' + u.sem + '</p><p class="num">' + esc(u.de) + '</p><p class="flecha">↓</p><p class="tiny">Esta semana</p><p class="num fuerte">' + esc(u.a) + '</p></div>'; }).join("") + '</div><p class="tiny">Desliza para ver más →</p>' : '<p>Esta semana nada subió todavía. Mismo peso y una rep más: así empieza.</p>') + '</section>' +
+    '<section class="sp-sec rv" id="sp-mejorar"><p class="sp-capn">Capítulo 3</p><p class="sp-frase">Todo atleta tiene su pendiente. Este es el tuyo.</p><h2>🔧 Hay que mejorar</h2>' + (D.bajo.length || D.faltan.length ? '<ul class="sp-lst">' + D.bajo.slice(0, 6).map(function(b){ return '<li><b>' + esc(b.n) + '</b>: ' + esc(b.nota || "bajó contra la semana pasada; repite el peso con descanso completo.") + '</li>'; }).join("") + (D.faltan.length ? '<li><b>Sin anotar</b>: ' + esc(D.faltan.join(", ")) + '.</li>' : '') + '</ul>' : '<p>Nada que corregir esta semana. ¡Así se hace!</p>') + '</section>' +
+    '<section class="sp-sec rv" id="sp-prox"><p class="sp-capn">Capítulo 4</p><p class="sp-frase">Así se ve tu siguiente paso.</p><h2>➡️ Tu próxima semana</h2>' + D.dias.map(function(d){ var rr = d.rows.filter(function(r){ return r.ob; }); if(!rr.length) return ''; return '<div class="sp-pd"><p class="lbl">' + esc(DIAS[d.i].n) + '</p>' + rr.map(function(r){ return '<div class="sp-meta"><span>' + esc(corto(r.x)) + '</span><b class="num">' + esc(limpiaTxt(r.ob.hit)) + '</b></div>'; }).join("") + '</div>'; }).join("") + '</section>' +
+    '<section class="sp-sec rv" id="sp-dia"><p class="sp-capn">Capítulo 5</p><p class="sp-frase">Para cuando quieras el detalle de cada día.</p><h2>📅 Día por día</h2><div class="chips sp-dias">' + D.dias.map(function(d, n){ return '<button type="button" data-spdia="' + n + '" aria-pressed="' + (n === 0) + '">' + DSEM[dowDe(d.i)].slice(0, 3) + (d.hecho ? ' ✓' : '') + '</button>'; }).join("") + '</div><div class="sp-diab"></div></section>' +
+    '<section class="sp-sec rv" id="sp-tips"><p class="sp-capn">Capítulo 6</p><p class="sp-frase">Lo que hace la diferencia fuera del gym.</p><h2>💡 Para mejorar cada semana</h2><ol class="sp-lst">' + D.R.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ol></section>' +
+    '<section class="sp-fin rv"><span class="av">' + (foto ? '<img src="' + foto + '" alt="" width="64" height="64">' : '<b>D</b>') + '</span><h2>Nos vemos el próximo viernes, ' + nom + '.</h2><p>Mientras, una sola meta: anota cada serie. Yo me encargo del resto.</p><button type="button" class="btn go" data-cerrar>A darle 💪</button></section>' +
     '<p class="tiny sp-pie">«Subió» compara contra la última vez que hiciste ese mismo ejercicio. La fuerza es una estimación con tu mejor serie.</p></div></div>';
   var old = $("sheet"); if(old) old.remove();
   document.body.insertAdjacentHTML("beforeend", h);
