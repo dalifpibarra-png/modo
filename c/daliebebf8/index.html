@@ -686,6 +686,27 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 @media (hover:hover){.card:hover{box-shadow:0 2px 2px rgba(20,27,33,.05),0 16px 30px -18px rgba(20,27,33,.45)}.btn:hover{transform:translateY(-1px)}}
 @media (prefers-reduced-motion: reduce){.sp-pl{animation:none}.tour-c{animation:none}}
 
+/* semana a detalle (18 oct 2026) */
+.btn.sm{min-height:38px;padding:8px 12px;font-size:.84rem;border-radius:10px}
+.sheet .in.full{max-height:94vh;gap:12px}
+.retro-acc{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sem-nav{display:flex;justify-content:space-between;gap:8px}
+.sem-nav .btn[disabled]{opacity:.35;pointer-events:none}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpis>div{background:var(--sunk);border-radius:12px;padding:10px 8px;display:grid;gap:2px;text-align:center}
+.kpis b{font:800 1.15rem/1.1 var(--display)} .kpis span{font-size:.72rem;color:var(--ink3);line-height:1.2}
+@media (max-width:420px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sem-top{background:var(--gold-w);border-radius:12px;padding:10px 12px;font-size:.92rem;margin:0}
+.dia-d .body{gap:10px}
+.ejd{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;background:var(--card)}
+.ejd[data-e="up"]{border-left-color:var(--ok)} .ejd[data-e="down"]{border-left-color:var(--bad)} .ejd[data-e="sin"]{border-left-color:var(--plate15)} .ejd[data-e="eq"],.ejd[data-e="nuevo"]{border-left-color:var(--acc)}
+.ejd-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px} .ejd-h b{min-width:0;font-size:.95rem;color:var(--ink)}
+.ejd-g{display:grid;grid-template-columns:1fr 1fr;gap:8px} .ejd-g p{font-size:.9rem;color:var(--ink);margin:2px 0 0;word-break:break-word}
+.ejd-v{font-size:.88rem;margin:0}
+.ejd-n{background:var(--acc-w);border-radius:10px;padding:8px 10px;display:grid;gap:2px} .ejd-n b{color:var(--ink);font-size:.95rem}
+.ejd .btn.sm{justify-self:start}
+.recs ol{margin:0;padding-left:20px;display:grid;gap:8px;font-size:.92rem;line-height:1.5}
+
 </style>
 <div class="wrap">
   <header class="top">
@@ -1023,7 +1044,7 @@ function ultimaNotaCoach(){
 function notasCoach(){
   var out = [];
   Object.keys(RETRO).forEach(function(id){ var r = RETRO[id], m = /^w(\d+)-d(\d)$/.exec(id); var f = m && DIAS[+m[2]] ? corta(fechaDe(+m[1], +m[2])) : (r.f || id); out.push({ id:id, f: f, t: esc(r.texto || ""), ts: r.ts || (m ? iso(fechaDe(+m[1], +m[2])) : "") }); });
-  COACH_WEB.forEach(function(c){ if(c && c.f && c.t) out.push({ id: "sem-" + c.f, f: (c.sem ? "Semana " + c.sem + " · " : "") + corta(deIso(c.f)), t: textoCoach(c.t), ts: c.f }); });
+  COACH_WEB.forEach(function(c){ if(c && c.f && c.t) out.push({ id: "sem-" + c.f, f: (c.sem ? "Semana " + c.sem + " · " : "") + corta(deIso(c.f)), t: textoCoach(c.t) + '<br><button type="button" class="btn sm" data-semdet="' + ((+c.sem || 1) - 1) + '" style="margin-top:8px">Ver la semana a detalle</button>', ts: c.f }); });
   (CFG.coach || []).forEach(function(c){ var f = c.hace !== undefined ? iso(masDias(HOY, -c.hace)) : c.f; out.push({ id: f, f: corta(deIso(f)), t: esc(c.t), ts: f }); });
   out.sort(function(a, b){ return a.ts < b.ts ? 1 : -1; });
   return out;
@@ -1420,7 +1441,7 @@ function informe(w){
 }
 function nInforme(){
   var I = informe(INF_W), filas = [["Sesiones", I.sesiones],["Series en rango", I.rango === null ? "·" : I.rango + " %"],["Carga total", I.carga || "·"],["Comidas cumplidas", I.comida || "·"],["Calorías promedio", I.kcalP ? miles(I.kcalP) : "·"],["Proteína promedio", I.protP ? I.protP + " g" : "·"],["Sueño promedio", I.sueno ? r1(I.sueno) + " h" : "·"],["Pasos promedio", I.pasos ? miles(I.pasos) : "·"],["Agua promedio", I.agua ? r1(I.agua) + " vasos" : "·"],["Puntos del día (promedio)", I.puntos === null ? "·" : I.puntos],["Molestias", I.mol.length ? I.mol.join(", ") : "ninguna"]];
-  return '<div class="card informe"><div class="hd"><button type="button" class="icbtn" data-infw="-1" aria-label="Semana anterior">‹</button><div style="text-align:center"><h2>Semana ' + (INF_W + 1) + '</h2><span class="tiny">' + fechaSem(INF_W) + '</span></div><button type="button" class="icbtn" data-infw="1" aria-label="Semana siguiente">›</button></div><dl style="margin-top:12px">' + filas.map(function(f){ return '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join("") + '</dl><div class="row" style="margin-top:14px"><button type="button" class="btn go" data-historias="' + INF_W + '">▶ Ver en historias</button><button type="button" class="btn" data-copiar="semana">Copiar para mandar</button><span class="tiny" data-copiado></span></div><textarea class="out" readonly aria-label="Informe para copiar"></textarea></div>';
+  return '<button type="button" class="btn go wide" data-semdet="' + INF_W + '" style="margin-bottom:10px">Ver ejercicio por ejercicio</button><div class="card informe"><div class="hd"><button type="button" class="icbtn" data-infw="-1" aria-label="Semana anterior">‹</button><div style="text-align:center"><h2>Semana ' + (INF_W + 1) + '</h2><span class="tiny">' + fechaSem(INF_W) + '</span></div><button type="button" class="icbtn" data-infw="1" aria-label="Semana siguiente">›</button></div><dl style="margin-top:12px">' + filas.map(function(f){ return '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join("") + '</dl><div class="row" style="margin-top:14px"><button type="button" class="btn go" data-historias="' + INF_W + '">▶ Ver en historias</button><button type="button" class="btn" data-copiar="semana">Copiar para mandar</button><span class="tiny" data-copiado></span></div><textarea class="out" readonly aria-label="Informe para copiar"></textarea></div>';
 }
 function textoSesion(i, w){
   var L = ["SESIÓN · " + DSEM[dowDe(i)] + " " + corta(fechaDe(w, i)) + " · semana " + (w + 1) + " · " + DIAS[i].n];
@@ -2201,7 +2222,7 @@ function mensajeCoach(){
 }
 function coachHTML(){
   var foto = CFG.coachFoto, rs = retroPendiente();
-  if(rs) return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + textoCoach(rs.t) + '</p><button type="button" class="btn" data-leida="' + esc(rs.f) + '" style="margin-top:10px">Listo, la leí ✓</button></div></section>';
+  if(rs) return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + textoCoach(rs.t) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Ver mi semana a detalle</button><button type="button" class="btn" data-leida="' + esc(rs.f) + '">Listo, la leí ✓</button></div></div></section>';
   var m = mensajeCoach();
   return '<section class="coach-v" data-tono="' + m.tono + '"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu coach · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + m.t + '</p></div></section>';
 }
@@ -2403,6 +2424,7 @@ document.addEventListener("click", function(e){
   if(d.g){ gymAccion(d.g, b); return; }
   if(d.gym !== undefined){ gymAbrir(); return; }
   if(d.historias !== undefined){ historias(+d.historias); return; }
+  if(d.semdet !== undefined){ semanaDetalleHTML(+d.semdet); var sh0 = $("sheet"); if(sh0 && sh0.firstChild) sh0.firstChild.scrollTop = 0; return; }
   if(d.leida){ set("leida-" + d.leida, "1"); toast("Guardada en Notas → Del coach"); return pintar(); }
   if(d.h){ var hs = $("hist"); if(d.h === "cerrar" || (d.h === "sig" && HIST.i >= HIST.S.length - 1)){ if(hs) hs.remove(); HIST = null; return; } HIST.i = clamp(HIST.i + (d.h === "sig" ? 1 : -1), 0, HIST.S.length - 1); histPintar(); return; }
   if(d.v && b.parentNode && b.parentNode.dataset && b.parentNode.dataset.chip){ var k = b.parentNode.dataset.chip, cur = dia(HOYI, k); setDia(HOYI, k, cur === d.v ? "" : d.v); return pintar(); }
@@ -2618,6 +2640,85 @@ setInterval(function(){ var c = $("s-clock"); if(!c || !c.dataset.ini) return; v
   Object.keys(P).forEach(function(k){ if(get(k) === null) set(k, P[k]); });
   set("precarga-ok", V);
 })();
+
+
+/* ── la semana a detalle (18 oct 2026) ──────────────────────────────────────
+   Dalí pidió que la retro semanal no se quedara corta: que el cliente vea
+   cada ejercicio de cada día, si lo hizo bien, cuánto subió y qué toca la
+   próxima semana. Todo sale de los datos del teléfono; el texto del coach
+   (si llegó) va arriba. */
+function mejorE1(L){ var b = null; (L || []).forEach(function(z){ var v = e1rmV(z.w, z.r); if(v && (!b || v > b)) b = v; }); return b; }
+function serTxt(L){ return L.map(function(z){ return (z.w ? z.w : "PC") + "×" + z.r; }).join(" · "); }
+function cmpEj(i, k, x, w){
+  var s = seriesDe(w, i, k, x[1]), rg = rango(x[1]), u = ultimaVez(i, k, w);
+  var c = { s: s, u: u, rg: rg, est: "sin", pct: null, enR: null, nota: "", def: 0, tope: false };
+  if(!s.length) return c;
+  var b1 = mejorE1(s), b0 = u ? mejorE1(u.s) : null, r1 = suma(s.map(function(z){ return z.r; })), r0 = u ? suma(u.s.map(function(z){ return z.r; })) : 0;
+  if(!u) c.est = "nuevo";
+  else if(b1 && b0){ c.pct = Math.round((b1 - b0) / b0 * 1000) / 10; c.est = c.pct >= .5 ? "up" : c.pct <= -.5 ? "down" : (r1 > r0 ? "up" : r1 < r0 ? "down" : "eq"); }
+  else c.est = r1 > r0 ? "up" : r1 < r0 ? "down" : "eq";
+  if(rg){
+    var rr = s.map(function(z){ return z.r; }), en = rr.filter(function(r){ return r >= rg.lo && r <= rg.hi; }).length, def = suma(rr.map(function(r){ return Math.max(0, rg.lo - r); }));
+    c.enR = en + " de " + Math.max(rg.n, rr.length) + " series en rango (" + rg.lo + " a " + rg.hi + ")";
+    c.def = def; c.tope = rr.length >= rg.n && rr.every(function(r){ return r >= rg.hi; });
+    if(rr.length < rg.n) c.nota = rg.n - rr.length === 1 ? "Faltó una serie." : "Faltaron " + (rg.n - rr.length) + " series.";
+    else if(c.tope) c.nota = "Llegaste al tope del rango: toca subir peso.";
+    else if(def >= 3) c.nota = "Quedaste " + def + " reps abajo del rango: el peso está alto.";
+    else if(def > 0) c.nota = def === 1 ? "Faltó una rep para el rango." : "Faltaron " + def + " reps para el rango.";
+    else c.nota = "Bien ejecutado: todo dentro del rango.";
+  }
+  return c;
+}
+var EST = { up:["ok","↑ Subió"], eq:["acc","= Igual"], down:["bad","↓ Bajó"], sin:["warn","Sin anotar"], nuevo:["acc","Primera vez"] };
+function limpiaTxt(t){ return String(t || "").replace(/<br>/g, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"); }
+function semanaDetalleHTML(w){
+  w = clamp(w, 0, NSEM - 1);
+  var coach = COACH_WEB.filter(function(c){ return +c.sem === w + 1; }).sort(function(a, b){ return a.f < b.f ? 1 : -1; })[0];
+  var T = { up:0, eq:0, down:0, sin:0, nuevo:0 }, hechas = 0, ser = 0, en = 0, top = null, sube = [], baja = [], faltan = [], mol = [], dh = [];
+  DIAS.forEach(function(d, i){
+    var hecho = sesionHecha(w, i) === 1, rows = "";
+    if(hecho) hechas++;
+    ejerciciosDe(i, w).forEach(function(x, k){
+      var opc = esOpcional(i, k, w), c = cmpEj(i, k, x, w), nom = corto(x);
+      if(opc && c.est === "sin") return;
+      T[c.est]++;
+      if(c.est === "sin") faltan.push(nom);
+      if(c.rg && c.s.length){ ser += Math.max(c.rg.n, c.s.length); en += c.s.filter(function(z){ return z.r >= c.rg.lo && z.r <= c.rg.hi; }).length; }
+      if(c.pct !== null && (!top || c.pct > top.pct)) top = { n: nom, pct: c.pct };
+      if(c.tope) sube.push(nom); if(c.def >= 3) baja.push(nom);
+      var ob = c.s.length ? objetivo(i, k, x, w + 1) : null, e = EST[c.est];
+      rows += '<div class="ejd" data-e="' + c.est + '"><div class="ejd-h"><b>' + esc(nombre(x)) + '</b><span class="pill ' + e[0] + '">' + e[1] + (c.pct !== null && c.est !== "eq" ? ' ' + (c.pct > 0 ? '+' : '') + c.pct + ' %' : '') + '</span></div>' +
+        '<p class="tiny">Pedido: ' + esc(x[1]) + (x[2] ? ' · RPE ' + esc(x[2]) : '') + (opc ? ' · opcional' : '') + '</p>' +
+        (c.s.length ? '<div class="ejd-g"><div><span class="lbl">Semana ' + (w + 1) + '</span><p class="num">' + serTxt(c.s) + '</p></div><div><span class="lbl">' + (c.u ? 'Semana ' + (c.u.w + 1) : 'Antes') + '</span><p class="num">' + (c.u ? serTxt(c.u.s) : 'primera vez') + '</p></div></div>' +
+          (c.enR ? '<p class="ejd-v">' + esc(c.enR) + '. ' + esc(c.nota) + '</p>' : '') +
+          (ob ? '<div class="ejd-n"><span class="lbl">Próxima semana</span><b class="num">' + esc(limpiaTxt(ob.hit)) + '</b><span class="tiny">' + esc(limpiaTxt(ob.why)) + '</span></div>' : '')
+        : '<p class="ejd-v">No quedó registrado. Si lo hiciste, anótalo en la sesión de ese día para que cuente en tu progreso.</p>') +
+        '<button type="button" class="btn sm" data-hist="' + i + '-' + k + '">Historial y técnica</button></div>';
+    });
+    var F = fbSesion(i, w); if(F.mol.length) mol.push(DIAS[i].n + ": " + F.mol.join(", "));
+    dh.push('<details class="dia-d"' + (dh.length === 0 ? ' open' : '') + '><summary><span>' + DSEM[dowDe(i)] + ' ' + corta(fechaDe(w, i)) + ' · ' + esc(DIAS[i].n) + '</span><span class="pill ' + (hecho ? 'ok' : 'warn') + '">' + (hecho ? 'hecho' : 'pendiente') + '</span></summary><div class="body">' + (rows || '<p>Sin ejercicios.</p>') + '</div></details>');
+  });
+  var I = informe(w), rec = [];
+  if(hechas < DIAS.length) rec.push("Hiciste " + hechas + " de " + DIAS.length + " sesiones. Si un día se complica, haz la versión corta: los primeros 3 ejercicios cuentan más que nada.");
+  if(faltan.length) rec.push("Anota todas las series. Quedaron sin registro: " + faltan.slice(0, 6).join(", ") + (faltan.length > 6 ? " y " + (faltan.length - 6) + " más" : "") + ". Lo que no se anota no se puede progresar.");
+  if(sube.length) rec.push("Listos para subir de peso: " + sube.join(", ") + ". Sube un escalón y las reps regresan al centro del rango.");
+  if(baja.length) rec.push("Baja un escalón en " + baja.join(", ") + " hasta que todas las series entren al rango. Bajar a tiempo es lo que te deja subir después.");
+  if(mol.length) rec.push("Molestias: " + mol.join(" · ") + ". Usa la alternativa del ejercicio o baja la carga; si duele más de 4 de 10 o dura 3 días, avísame.");
+  if(I.sueno && I.sueno < CK.sueno) rec.push("Dormiste " + r1(I.sueno) + " h en promedio y la meta es " + CK.sueno + ". El músculo se construye durmiendo: es la mejora más barata que tienes.");
+  if(I.agua && I.agua < CK.agua * .8) rec.push("Agua: " + r1(I.agua) + " vasos al día de " + CK.agua + ". Llegar hidratado sostiene la primera serie.");
+  if(!rec.length) rec.push("Semana sólida. Mantén el orden: 2 series de aproximación, descanso completo en los básicos y anota todo.");
+  var pr = ser ? Math.round(en / ser * 100) : null;
+  var h = '<div class="sheet" id="sheet"><div class="in full" role="dialog" aria-label="Semana ' + (w + 1) + ' a detalle"><div class="hd"><div><p class="lbl">Tu semana a detalle</p><h2 class="t-sec">Semana ' + (w + 1) + ' · ' + fechaSem(w) + '</h2></div><button type="button" class="icbtn" data-cerrar aria-label="Cerrar">✕</button></div>' +
+    '<div class="sem-nav"><button type="button" class="btn sm" data-semdet="' + (w - 1) + '"' + (w <= 0 ? ' disabled' : '') + '>‹ Semana ' + w + '</button><button type="button" class="btn sm" data-semdet="' + (w + 1) + '"' + (w >= NSEM - 1 ? ' disabled' : '') + '>Semana ' + (w + 2) + ' ›</button></div>' +
+    '<div class="kpis"><div><b class="num">' + hechas + '/' + DIAS.length + '</b><span>sesiones</span></div><div><b class="num">' + (pr === null ? '·' : pr + ' %') + '</b><span>series en rango</span></div><div><b class="num" style="color:var(--ok)">' + T.up + '</b><span>ejercicios subieron</span></div><div><b class="num">' + T.eq + ' · ' + T.down + '</b><span>igual · bajaron</span></div></div>' +
+    (top && top.pct > 0 ? '<p class="sem-top">🏆 Mejor avance: <b>' + esc(top.n) + '</b>, +' + top.pct + ' % de fuerza estimada contra la vez anterior.</p>' : '') +
+    (coach ? '<div class="coachbox"><span class="lbl">Del coach · ' + esc(corta(deIso(coach.f))) + '</span>' + textoCoach(coach.t) + '</div>' : '') +
+    '<section><h3 class="t-sec" style="font-size:1rem;margin:4px 0 6px">Día por día</h3>' + dh.join("") + '</section>' +
+    '<section class="recs"><h3 class="t-sec" style="font-size:1rem;margin:4px 0 6px">Para mejorar la próxima semana</h3><ol>' + rec.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ol></section>' +
+    '<p class="tiny">Fuerza estimada: promedio de dos fórmulas (Epley y Brzycki) con tu mejor serie. «Subió» compara contra la última vez que hiciste ese mismo ejercicio.</p></div></div>';
+  var old = $("sheet"); if(old) old.remove();
+  document.body.insertAdjacentHTML("beforeend", h);
+}
 
 /* ── retros del coach desde la hoja (18 oct 2026) ──────────────────────────
    La rutina de los viernes escribe la retro de cada cliente en la pestaña
