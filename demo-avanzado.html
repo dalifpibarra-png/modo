@@ -707,6 +707,13 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 .ejd .btn.sm{justify-self:start}
 .recs ol{margin:0;padding-left:20px;display:grid;gap:8px;font-size:.92rem;line-height:1.5}
 
+.puntos{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.puntos h3{font-size:1.02rem;margin:0 0 8px}
+.puntos ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.puntos li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:6px;font-size:.95rem;line-height:1.45}
+.puntos .em{font-size:1.15rem;line-height:1.3}
+.resumen-btn{justify-content:flex-start}
+
 </style>
 <div class="wrap">
   <header class="top">
@@ -987,6 +994,7 @@ function vHoy(){
     '<div class="score"><b data-cuenta="' + sc.total + '">' + sc.total + '</b><span>puntos de hoy ' + infoBtn("puntos") + '<br>' + frase + '</span></div>' +
     '<div class="pilares">' + DISCOS.map(function(d){ var v = sc.parts[d.k]; return '<button type="button" class="pilar" data-ir="' + d.k + '" data-s="' + (v >= .9 ? 'full' : v > 0 ? 'half' : 'none') + '"><span class="i" style="color:' + d.col + '">' + ic(d.ico, 20) + '</span><span class="n">' + d.n + '</span><span class="v">' + esc(sc.val[d.k]) + '</span></button>'; }).join("") + '</div></section>';
   h += coachHTML();
+  if(SEM_REAL > 0 || dowL(HOY) >= 4){ var wR = dowL(HOY) >= 4 ? SEM_HOY : Math.max(0, SEM_HOY - 1); h += '<button type="button" class="btn wide resumen-btn" data-semdet="' + wR + '">📋 Mi semana ' + (wR + 1) + ' en resumen</button>'; }
   // lo que toca
   h += '<section class="card"><div class="hd"><h2>' + ic("diana", 18) + ' Lo que toca hoy</h2></div><div class="stack">';
   if(i >= 0 && SEM_REAL >= 0 && SEM_REAL < NSEM){
@@ -2222,7 +2230,7 @@ function mensajeCoach(){
 }
 function coachHTML(){
   var foto = CFG.coachFoto, rs = retroPendiente();
-  if(rs) return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + textoCoach(rs.t) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Ver mi semana a detalle</button><button type="button" class="btn" data-leida="' + esc(rs.f) + '">Listo, la leí ✓</button></div></div></section>';
+  if(rs) return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + textoCoach(rs.t) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Ver mi semana en resumen</button><button type="button" class="btn" data-leida="' + esc(rs.f) + '">Listo, la leí ✓</button></div></div></section>';
   var m = mensajeCoach();
   return '<section class="coach-v" data-tono="' + m.tono + '"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu coach · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + m.t + '</p></div></section>';
 }
@@ -2675,7 +2683,7 @@ function limpiaTxt(t){ return String(t || "").replace(/<br>/g, " ").replace(/<[^
 function semanaDetalleHTML(w){
   w = clamp(w, 0, NSEM - 1);
   var coach = COACH_WEB.filter(function(c){ return +c.sem === w + 1; }).sort(function(a, b){ return a.f < b.f ? 1 : -1; })[0];
-  var T = { up:0, eq:0, down:0, sin:0, nuevo:0, cambio:0 }, hechas = 0, ser = 0, en = 0, top = null, sube = [], baja = [], faltan = [], mol = [], dh = [];
+  var T = { up:0, eq:0, down:0, sin:0, nuevo:0, cambio:0 }, hechas = 0, ser = 0, en = 0, top = null, sube = [], baja = [], faltan = [], mol = [], dh = [], ups = [], bajo = [];
   DIAS.forEach(function(d, i){
     var hecho = sesionHecha(w, i) === 1, rows = "";
     if(hecho) hechas++;
@@ -2686,6 +2694,8 @@ function semanaDetalleHTML(w){
       if(c.est === "sin") faltan.push(nom);
       if(c.rg && c.s.length){ ser += Math.max(c.rg.n, c.s.length); en += c.s.filter(function(z){ return z.r >= c.rg.lo && z.r <= c.rg.hi; }).length; }
       if(c.pct !== null && (!top || c.pct > top.pct)) top = { n: nom, pct: c.pct };
+      if(c.est === "up" && c.u) ups.push({ n: nom, pct: c.pct || 0, de: serTxt(c.u.s), a: serTxt(c.s) });
+      if(c.est === "down") bajo.push(nom);
       if(c.tope) sube.push(nom); if(c.def >= 3) baja.push(nom);
       var ob = c.s.length ? objetivo(i, k, x, w + 1) : null, e = EST[c.est];
       rows += '<div class="ejd" data-e="' + c.est + '"><div class="ejd-h"><b>' + esc(nombre(x)) + '</b><span class="pill ' + e[0] + '">' + e[1] + (c.pct !== null && c.est !== "eq" ? ' ' + (c.pct > 0 ? '+' : '') + c.pct + ' %' : '') + '</span></div>' +
@@ -2708,13 +2718,26 @@ function semanaDetalleHTML(w){
   if(I.sueno && I.sueno < CK.sueno) rec.push("Dormiste " + r1(I.sueno) + " h en promedio y la meta es " + CK.sueno + ". El músculo se construye durmiendo: es la mejora más barata que tienes.");
   if(I.agua && I.agua < CK.agua * .8) rec.push("Agua: " + r1(I.agua) + " vasos al día de " + CK.agua + ". Llegar hidratado sostiene la primera serie.");
   if(!rec.length) rec.push("Semana sólida. Mantén el orden: 2 series de aproximación, descanso completo en los básicos y anota todo.");
-  var pr = ser ? Math.round(en / ser * 100) : null;
-  var h = '<div class="sheet" id="sheet"><div class="in full" role="dialog" aria-label="Semana ' + (w + 1) + ' a detalle"><div class="hd"><div><p class="lbl">Tu semana a detalle</p><h2 class="t-sec">Semana ' + (w + 1) + ' · ' + fechaSem(w) + '</h2></div><button type="button" class="icbtn" data-cerrar aria-label="Cerrar">✕</button></div>' +
+  var pr = ser ? Math.round(en / ser * 100) : null, nom1 = esc(CFG.nombre), P = [];
+  ups.sort(function(a, b){ return b.pct - a.pct; });
+  var upsU = ups.filter(function(u, n){ return ups.map(function(z){ return z.n; }).indexOf(u.n) === n; }); // el mismo ejercicio en dos días cuenta una vez
+  P.push(["💪", hechas >= DIAS.length ? "<b>Entrenaste los " + DIAS.length + " días.</b> Oye, eso es constancia de verdad." : hechas ? "<b>Entrenaste " + hechas + " de " + DIAS.length + " días.</b> Vamos por la semana completa, que ahí está el cambio." : "<b>Esta semana no hubo entrenos anotados.</b> Tranqui, se retoma: lo importante es volver."]);
+  if(ups.length) P.push(["🔥", "<b>Subiste en " + ups.length + (ups.length === 1 ? " ejercicio" : " ejercicios") + ".</b> Lo hiciste increíble en " + upsU.slice(0, 3).map(function(u){ return "<b>" + esc(u.n) + "</b> (de " + esc(u.de) + " a " + esc(u.a) + ")"; }).join(", ") + "."]);
+  if(T.eq) P.push(["➖", T.eq + (T.eq === 1 ? " ejercicio se mantuvo" : " ejercicios se mantuvieron") + " igual. Normal: no todo sube cada semana; la próxima va una rep más."]);
+  if(bajo.length || baja.length) P.push(["🔧", "<b>Hay que mejorar en " + esc(bajo.concat(baja).filter(function(v, n, a){ return a.indexOf(v) === n; }).slice(0, 4).join(", ")) + ".</b> Baja un poquito el peso, descansa completo y que todas las series entren al rango."]);
+  if(faltan.length) P.push(["📝", "Oye, quedaron <b>" + faltan.length + " ejercicios sin anotar</b>. Anótalos aunque sea rápido: lo que no se anota no lo puedo ajustar."]);
+  if(I.sueno) P.push(["😴", "Dormiste <b>" + r1(I.sueno) + " h</b> en promedio" + (I.sueno >= CK.sueno ? ". Muy bien, ahí es donde crece el músculo." : " y la meta es " + CK.sueno + ". Ese es tu punto fácil de mejora.")]);
+  if(I.agua) P.push(["💧", "Agua: <b>" + r1(I.agua) + " de " + CK.agua + " vasos</b> al día" + (I.agua >= CK.agua * .8 ? ". Bien hidratado." : ". Súbele: rinde más tu primera serie.")]);
+  if(I.pasos) P.push(["🚶", "Pasos: <b>" + miles(I.pasos) + "</b> al día en promedio."]);
+  if(mol.length) P.push(["⚠️", "Molestias: " + esc(mol.join(" · ")) + ". Cuídalo y avísame si sigue."]);
+  if(!I.sueno && !I.agua) P.push(["📲", "Haz tu check-in diario (sueño, agua, energía): con eso te puedo dar mejores consejos."]);
+  var h = '<div class="sheet" id="sheet"><div class="in full" role="dialog" aria-label="Semana ' + (w + 1) + ' a detalle"><div class="hd"><div><p class="lbl">Tu semana en resumen</p><h2 class="t-sec">Semana ' + (w + 1) + ' · ' + fechaSem(w) + '</h2></div><button type="button" class="icbtn" data-cerrar aria-label="Cerrar">✕</button></div>' +
     '<div class="sem-nav"><button type="button" class="btn sm" data-semdet="' + (w - 1) + '"' + (w <= 0 ? ' disabled' : '') + '>‹ Semana ' + w + '</button><button type="button" class="btn sm" data-semdet="' + (w + 1) + '"' + (w >= NSEM - 1 ? ' disabled' : '') + '>Semana ' + (w + 2) + ' ›</button></div>' +
     '<div class="kpis"><div><b class="num">' + hechas + '/' + DIAS.length + '</b><span>sesiones</span></div><div><b class="num">' + (pr === null ? '·' : pr + ' %') + '</b><span>series en rango</span></div><div><b class="num" style="color:var(--ok)">' + T.up + '</b><span>ejercicios subieron</span></div><div><b class="num">' + T.eq + ' · ' + T.down + '</b><span>igual · bajaron</span></div></div>' +
+    '<section class="puntos"><h3 class="t-sec">Tu semana en puntos, ' + nom1 + '</h3><ul>' + P.map(function(q){ return '<li><span class="em">' + q[0] + '</span><span>' + q[1] + '</span></li>'; }).join("") + '</ul></section>' +
     (top && top.pct > 0 ? '<p class="sem-top">🏆 Mejor avance: <b>' + esc(top.n) + '</b>, +' + top.pct + ' % de fuerza estimada contra la vez anterior.</p>' : '') +
     (coach ? '<div class="coachbox"><span class="lbl">Del coach · ' + esc(corta(deIso(coach.f))) + '</span>' + textoCoach(coach.t) + '</div>' : '') +
-    '<section><h3 class="t-sec" style="font-size:1rem;margin:4px 0 6px">Día por día</h3>' + dh.join("") + '</section>' +
+    '<section><h3 class="t-sec" style="font-size:1rem;margin:4px 0 6px">Día por día, ejercicio por ejercicio</h3>' + dh.join("") + '</section>' +
     '<section class="recs"><h3 class="t-sec" style="font-size:1rem;margin:4px 0 6px">Para mejorar la próxima semana</h3><ol>' + rec.map(function(r){ return '<li>' + esc(r) + '</li>'; }).join("") + '</ol></section>' +
     '<p class="tiny">Fuerza estimada: promedio de dos fórmulas (Epley y Brzycki) con tu mejor serie. «Subió» compara contra la última vez que hiciste ese mismo ejercicio.</p></div></div>';
   var old = $("sheet"); if(old) old.remove();
