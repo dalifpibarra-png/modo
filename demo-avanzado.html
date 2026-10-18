@@ -800,6 +800,10 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
   .sp-carr+.tiny{display:none}
 }
 
+.consent{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;align-items:start;font-size:.92rem;line-height:1.45;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--sunk)}
+.consent input{width:20px;height:20px;margin-top:2px}
+[data-consiento][disabled]{opacity:.45}
+
 </style>
 <div class="wrap">
   <header class="top">
@@ -1574,7 +1578,7 @@ function hojaAjustes(){
       '<label class="f"><span>¿A qué hora entrenas?</span><input type="time" id="aj-hora" value="' + esc(get("hora-entreno") || CFG.horaEntreno || "18:00") + '"></label>' +
       '<button type="button" class="btn" data-ics>📅 Poner mis entrenos en el calendario del cel</button><p class="tiny">Cada día de entreno con aviso 30 minutos antes, hasta que termine tu bloque.</p></div></details>' +
     (CFG.demo ? '<button type="button" class="btn" data-reinicia>Reiniciar el demo</button>' : '') +
-    '<p class="tiny">' + esc(CFG.pie || "") + '</p></div></div>';
+    '<p class="tiny">' + esc(CFG.pie || "") + (CFG.rol === "cliente" ? ' · <a href="' + urlLegal("privacidad.html") + '" target="_blank" rel="noopener">Aviso de privacidad</a> · <a href="' + urlLegal("terminos.html") + '" target="_blank" rel="noopener">Términos</a>' : '') + '</p></div></div>';
   document.body.insertAdjacentHTML("beforeend", s);
   if(AJ_OPEN) document.querySelectorAll("#sheet .aj-d").forEach(function(d){ if(d.querySelector("summary").textContent === AJ_OPEN) d.open = true; });
 }
@@ -2541,6 +2545,7 @@ document.addEventListener("click", function(e){
   if(d.letra){ set("letra", d.letra); aplicaEstilo(); $("sheet").remove(); hojaAjustes(); return; }
   if(d.autores){ set("autores", d.autores); $("sheet").remove(); hojaAjustes(); return; }
   if(d.ics !== undefined){ icsEntrenos(); return; }
+  if(d.consiento !== undefined){ var ts = new Date().toISOString(); set("consentimiento", ts); setDia(HOYI, "consentimiento", "v1 " + ts); var s3 = $("sheet"); if(s3) s3.remove(); toast("¡Listo! A darle 💪"); if(window.__mandaWeb) window.__mandaWeb(); render(); return; }
   if(d.semdet !== undefined){ semanaDetalleHTML(+d.semdet); var sh0 = $("sheet"); if(sh0 && sh0.firstChild) sh0.firstChild.scrollTop = 0; return; }
   if(d.leida){ set("leida-" + d.leida, "1"); toast("Guardada en Notas → Del coach"); return pintar(); }
   if(d.h){ var hs = $("hist"); if(d.h === "cerrar" || (d.h === "sig" && HIST.i >= HIST.S.length - 1)){ if(hs) hs.remove(); HIST = null; return; } HIST.i = clamp(HIST.i + (d.h === "sig" ? 1 : -1), 0, HIST.S.length - 1); histPintar(); return; }
@@ -2607,6 +2612,7 @@ document.addEventListener("input", function(e){
 });
 document.addEventListener("change", function(e){
   var tid = e.target && e.target.id;
+  if(tid === "cons-ok"){ var bc = document.querySelector("[data-consiento]"); if(bc) bc.disabled = !e.target.checked; return; }
   if(tid === "aj-apodo" || tid === "aj-frase" || tid === "aj-hora"){ var kk = tid === "aj-apodo" ? "apodo" : tid === "aj-frase" ? "frase" : "hora-entreno", vv = String(e.target.value || "").trim(); if(vv) set(kk, vv); else del(kk); toast("Guardado ✓"); return; }
   var t = e.target;
   if(t.dataset.super){ set(t.dataset.super, t.checked ? "1" : ""); t.closest("li").classList.toggle("on", t.checked); return; }
@@ -2737,6 +2743,7 @@ setInterval(function(){ var c = $("s-clock"); if(!c || !c.dataset.ini) return; v
   function manda(){
     Object.keys(cola).forEach(function(x){ pend[x] = 1; }); cola = {};
     var L = Object.keys(pend); if(!L.length) return; set("web-pend", JSON.stringify(pend));
+    if(CFG.rol === "cliente" && !get("consentimiento")) return; // 🔒 datos de salud: nada sale sin consentimiento expreso (LFPDPPP)
     L.forEach(function(x){
       var q = x.split("|"), g = GRUPOS.filter(function(z){ return z.col === q[0]; })[0]; if(!g) return;
       var kv = {}, p = g.pre(q[1]); claves(p).forEach(function(k){ kv[k.slice(p.length)] = get(k); });
@@ -2745,6 +2752,7 @@ setInterval(function(){ var c = $("s-clock"); if(!c || !c.dataset.ini) return; v
       try{ fetch(CFG.webhook, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(cuerpo) }).then(function(){ delete pend[x]; MEM["web-pend"] = JSON.stringify(pend); try{ localStorage.setItem(NS + "web-pend", MEM["web-pend"]); }catch(e){} }, function(){}); }catch(e){}
     });
   }
+  window.__mandaWeb = manda;
   window.__webQueue = function(k){ var r = grupoDe(k); if(!r) return; cola[r.g.col + "|" + r.id] = 1; clearTimeout(tm); tm = setTimeout(manda, 2500); };
   setTimeout(manda, 4000);
 })();
@@ -2918,6 +2926,12 @@ function icsEntrenos(){
   try{ var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([out.join("\r\n")], { type: "text/calendar" })); a.download = "MODO-entrenos.ics"; document.body.appendChild(a); a.click(); setTimeout(function(){ a.remove(); }, 1000); toast("Abre el archivo y toca «Agregar todo» para tu calendario"); }catch(e){ toast("Tu navegador no dejó crear el archivo"); }
 }
 
+/* ── consentimiento expreso (18 oct 2026): la ley pide aceptarlo antes de tratar datos de salud ── */
+function urlLegal(f){ var u = location.href.split("#")[0]; return u.indexOf("/c/") > -1 ? u.split("/c/")[0] + "/" + f : f; }
+function pideConsentimiento(){
+  if(CFG.demo || CFG.rol !== "cliente" || get("consentimiento") || $("sheet")) return;
+  document.body.insertAdjacentHTML("beforeend", '<div class="sheet" id="sheet"><div class="in" role="dialog" aria-label="Antes de empezar"><h2 class="t-sec">Antes de empezar</h2><p>Tu app guarda tu entrenamiento y algunos datos de salud (molestias, sueño, peso) para que tu coach ajuste tu plan. <b>Nada se envía hasta que aceptes.</b></p><label class="consent"><input type="checkbox" id="cons-ok"><span>Leí y acepto el <a href="' + urlLegal("privacidad.html") + '" target="_blank" rel="noopener">aviso de privacidad</a> y los <a href="' + urlLegal("terminos.html") + '" target="_blank" rel="noopener">términos</a>, y doy mi consentimiento para el uso de mis datos de salud.</span></label><button type="button" class="btn go wide" data-consiento disabled>Empezar</button></div></div>');
+}
 function autoResumen(){
   var r = retroPendiente(); if(!r || (get("autores") || "1") !== "1" || get("auto-" + r.f) || $("sheet") || $("hist")) return;
   set("auto-" + r.f, "1"); semanaDetalleHTML((+r.sem || SEM_HOY + 1) - 1);
@@ -2936,7 +2950,7 @@ function autoResumen(){
       render(); autoResumen();
     }).catch(function(){});
   }
-  setTimeout(trae, 1200); setTimeout(autoResumen, 900);
+  setTimeout(trae, 1200); setTimeout(function(){ pideConsentimiento(); autoResumen(); }, 900);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) trae(); });
 })();
 
