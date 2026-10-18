@@ -1656,7 +1656,7 @@ function nInforme(){
 function textoSesion(i, w){
   var L = ["SESIÓN · " + DSEM[dowDe(i)] + " " + corta(fechaDe(w, i)) + " · semana " + (w + 1) + " · " + DIAS[i].n];
   var sinA = [];
-  ejerciciosDe(i, w).forEach(function(x, k){ var s = seriesDe(w, i, k, x[1]); if(!s.length){ sinA.push(corto(x)); return; } var pw = s.every(function(z){ return z.w === s[0].w; }); L.push("• " + corto(x) + ": " + (pw && s[0].w ? s[0].w + " × " + s.map(function(z){ return z.r; }).join(", ") : s.map(function(z){ return (z.w ? z.w + "×" : "") + z.r; }).join(", "))); });
+  ejerciciosDe(i, w).forEach(function(x, k){ var s = seriesDe(w, i, k, x[1]); if(!s.length){ sinA.push(corto(x)); return; } var pw = s.every(function(z){ return z.w === s[0].w; }); L.push((k + 1) + ". " + corto(x) + ": " + (pw && s[0].w ? s[0].w + " × " + s.map(function(z){ return z.r; }).join(", ") : s.map(function(z){ return (z.w ? z.w + "×" : "") + z.r; }).join(", "))); });
   if(sinA.length) L.push("Sin anotar: " + sinA.join(", "));
   var R = lineasRetro(i, w), p = "w" + w + "-d" + i + "-";
   function pl(t){ return String(t).replace(/<br>/g, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"); }
