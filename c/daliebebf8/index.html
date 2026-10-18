@@ -1023,6 +1023,8 @@ function ultimaVez(i, k, w){
 function objetivo(i, k, x, w){
   var rg = rango(x[1]);
   if(esDeload(w)) return { lbl:"Descarga", hit: x[1] + " · RPE 6 a 7", t:"keep", w:null, reps:[], why:"Mismo peso de la semana anterior, menos series y paras con 3 repeticiones en el tanque." };
+  var pw = planWeb(w), pa = pw && pw.ajustes && pw.ajustes["d" + i + "-e" + k];
+  if(pa && pa[0]){ var pp = parseHit(pa[0]); return { lbl: "Coach · semana " + (w + 1), hit: esc(pa[0]), why: esc(pa[1] || ""), t: /SUBE/i.test(pa[0]) ? "up" : (/BAJA|CAMBIA|PRUEBA/i.test(pa[0]) ? "chg" : "keep"), w: pp.w, reps: pp.reps }; }
   var aj = AJUSTE["d" + i + "-e" + k];
   if(aj && w < AJUSTE_SEM && (!aj[3] || aj[3] - 1 === w)){
     var p = parseHit(aj[0]);
@@ -1154,7 +1156,15 @@ var VIEW = VIEWS.indexOf(HASH) >= 0 ? HASH : (ENL ? "entreno" : "hoy");
 var SUB = { entreno:"sesion", comida:"hoy", avances:"fuerza", notas:"diario" };
 var RETRO = {};
 /* retros semanales del coach que llegan de la hoja (18 oct 2026): [{f:"AAAA-MM-DD", t, sem}] */
-var COACH_WEB = []; try{ COACH_WEB = JSON.parse(localStorage.getItem((typeof NS !== "undefined" ? NS : "") + "coach-web") || "[]") || []; }catch(e){}
+var COACH_WEB = [], PLAN_WEB = []; try{ COACH_WEB = JSON.parse(localStorage.getItem((typeof NS !== "undefined" ? NS : "") + "coach-web") || "[]") || []; }catch(e){}
+/* plan del domingo (18 oct 2026): filas con f = «plan-AAAA-MM-DD», sem = semana que arranca y t = {"nota": "...", "ajustes": {"d1-e2": ["125 lb · 10,9,8", "por qué"]}}.
+   Solo trae EXCEPCIONES; todo lo demás lo sigue calculando la doble progresión. */
+function separaPlan(){ PLAN_WEB = COACH_WEB.filter(function(r){ return /^plan-/.test(r.f || ""); }); COACH_WEB = COACH_WEB.filter(function(r){ return !/^plan-/.test(r.f || ""); }); }
+separaPlan();
+function planWeb(w){
+  var r = PLAN_WEB.filter(function(x){ return +x.sem === w + 1; }).sort(function(a, b){ return a.f < b.f ? 1 : -1; })[0];
+  if(!r) return null; try{ var o = typeof r.t === "string" ? JSON.parse(r.t) : r.t; return o && typeof o === "object" ? o : null; }catch(e){ return null; }
+}
 function textoCoach(t){ return esc(t).replace(/\n/g, "<br>"); }
 function retroPendiente(){
   var r = COACH_WEB.slice().sort(function(a, b){ return a.f < b.f ? 1 : -1; })[0];
@@ -2854,7 +2864,7 @@ setInterval(function(){ var c = $("s-clock"); if(!c || !c.dataset.ini) return; v
       var q = x.split("|"), g = GRUPOS.filter(function(z){ return z.col === q[0]; })[0]; if(!g) return;
       var kv = {}, p = g.pre(q[1]); claves(p).forEach(function(k){ kv[k.slice(p.length)] = get(k); });
       var cuerpo = { k: CFG.webhookClave || "", cliente: CFG.slug, nombre: CFG.nombre, col: q[0], id: q[1], ts: new Date().toISOString(), kv: kv };
-      if(q[0] === "sesiones"){ var m = /^w(\d+)-d(\d+)$/.exec(q[1]); if(m) try{ cuerpo.resumen = textoSesion(+m[2], +m[1]); }catch(e){} }
+      if(q[0] === "sesiones"){ var m = /^w(\d+)-d(\d+)$/.exec(q[1]); if(m) try{ cuerpo.resumen = textoSesion(+m[2], +m[1]); kv._ej = ejerciciosDe(+m[2], +m[1]).map(function(x, k){ return k + ":" + corto(x); }).join("|"); }catch(e){} }
       try{ fetch(CFG.webhook, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body: JSON.stringify(cuerpo) }).then(function(){ delete pend[x]; MEM["web-pend"] = JSON.stringify(pend); try{ localStorage.setItem(NS + "web-pend", MEM["web-pend"]); }catch(e){} }, function(){}); }catch(e){}
     });
   }
@@ -3051,8 +3061,8 @@ function autoResumen(){
   function trae(){
     fetch(CFG.webhook + "?coach=" + encodeURIComponent(CFG.slug) + "&k=" + encodeURIComponent(CFG.webhookClave || "")).then(function(r){ return r.json(); }).then(function(L){
       if(!Array.isArray(L)) return;
-      var nuevo = JSON.stringify(L); if(nuevo === JSON.stringify(COACH_WEB)) return;
-      COACH_WEB = L; MEM["coach-web"] = nuevo; try{ localStorage.setItem(NS + "coach-web", nuevo); }catch(e){}
+      var nuevo = JSON.stringify(L), viejo = null; try{ viejo = localStorage.getItem(NS + "coach-web"); }catch(e){} if(nuevo === viejo) return;
+      COACH_WEB = L; separaPlan(); MEM["coach-web"] = nuevo; try{ localStorage.setItem(NS + "coach-web", nuevo); }catch(e){}
       render(); autoResumen();
     }).catch(function(){});
   }
