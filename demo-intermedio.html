@@ -699,7 +699,7 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 .sem-top{background:var(--gold-w);border-radius:12px;padding:10px 12px;font-size:.92rem;margin:0}
 .dia-d .body{gap:10px}
 .ejd{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;background:var(--card)}
-.ejd[data-e="up"]{border-left-color:var(--ok)} .ejd[data-e="down"]{border-left-color:var(--bad)} .ejd[data-e="sin"]{border-left-color:var(--plate15)} .ejd[data-e="eq"],.ejd[data-e="nuevo"]{border-left-color:var(--acc)}
+.ejd[data-e="up"]{border-left-color:var(--ok)} .ejd[data-e="down"]{border-left-color:var(--bad)} .ejd[data-e="sin"]{border-left-color:var(--plate15)} .ejd[data-e="eq"],.ejd[data-e="nuevo"],.ejd[data-e="cambio"]{border-left-color:var(--acc)}
 .ejd-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px} .ejd-h b{min-width:0;font-size:.95rem;color:var(--ink)}
 .ejd-g{display:grid;grid-template-columns:1fr 1fr;gap:8px} .ejd-g p{font-size:.9rem;color:var(--ink);margin:2px 0 0;word-break:break-word}
 .ejd-v{font-size:.88rem;margin:0}
@@ -2655,6 +2655,7 @@ function cmpEj(i, k, x, w){
   if(!s.length) return c;
   var b1 = mejorE1(s), b0 = u ? mejorE1(u.s) : null, r1 = suma(s.map(function(z){ return z.r; })), r0 = u ? suma(u.s.map(function(z){ return z.r; })) : 0;
   if(!u) c.est = "nuevo";
+  else if(b1 && b0 && (b1 / b0 > 1.5 || b1 / b0 < .6)) c.est = "cambio"; // un salto así es otro equipo u otra forma de anotar, no progreso
   else if(b1 && b0){ c.pct = Math.round((b1 - b0) / b0 * 1000) / 10; c.est = c.pct >= .5 ? "up" : c.pct <= -.5 ? "down" : (r1 > r0 ? "up" : r1 < r0 ? "down" : "eq"); }
   else c.est = r1 > r0 ? "up" : r1 < r0 ? "down" : "eq";
   if(rg){
@@ -2669,12 +2670,12 @@ function cmpEj(i, k, x, w){
   }
   return c;
 }
-var EST = { up:["ok","↑ Subió"], eq:["acc","= Igual"], down:["bad","↓ Bajó"], sin:["warn","Sin anotar"], nuevo:["acc","Primera vez"] };
+var EST = { up:["ok","↑ Subió"], eq:["acc","= Igual"], down:["bad","↓ Bajó"], sin:["warn","Sin anotar"], nuevo:["acc","Primera vez"], cambio:["acc","Cambió el equipo"] };
 function limpiaTxt(t){ return String(t || "").replace(/<br>/g, " ").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&"); }
 function semanaDetalleHTML(w){
   w = clamp(w, 0, NSEM - 1);
   var coach = COACH_WEB.filter(function(c){ return +c.sem === w + 1; }).sort(function(a, b){ return a.f < b.f ? 1 : -1; })[0];
-  var T = { up:0, eq:0, down:0, sin:0, nuevo:0 }, hechas = 0, ser = 0, en = 0, top = null, sube = [], baja = [], faltan = [], mol = [], dh = [];
+  var T = { up:0, eq:0, down:0, sin:0, nuevo:0, cambio:0 }, hechas = 0, ser = 0, en = 0, top = null, sube = [], baja = [], faltan = [], mol = [], dh = [];
   DIAS.forEach(function(d, i){
     var hecho = sesionHecha(w, i) === 1, rows = "";
     if(hecho) hechas++;
