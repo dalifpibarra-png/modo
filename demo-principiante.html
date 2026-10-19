@@ -894,6 +894,13 @@ details.grp .grp-in .card{box-shadow:none}
 .tour-b{width:100%;gap:8px;margin-top:4px}
 .tour-b .grow{flex:1}
 @media (prefers-reduced-motion: reduce){.tour-hole,.tour.sp .tour-c{transition:none}}
+/* pastilla «¿Repaso rápido?» en cada entrada (19 oct 2026) */
+.tchip{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);z-index:70;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 32px);padding:10px 12px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:0 16px 34px -14px rgba(0,0,0,.45);opacity:0;transition:opacity .3s,transform .3s}
+.tchip.on{opacity:1;transform:translate(-50%,0)}
+.tchip span{font-weight:700;font-size:.92rem}
+.tchip .btn{min-height:40px;padding:8px 14px}
+@media (min-width:1000px){.tchip{bottom:24px}}
+@media (prefers-reduced-motion: reduce){.tchip{transition:none}}
 
 </style>
 <div class="wrap">
@@ -2609,9 +2616,18 @@ function tourAuto(n){ // primera vez: espera a que no haya nada abierto (consent
   if(faltaConsent() || $("sheet") || $("gym")) return setTimeout(function(){ tourAuto((n || 0) + 1); }, 1500);
   tour(0);
 }
+function tourChip(n){ // 19 oct 2026: «que siempre al entrar le salga la guía» → en cada entrada se OFRECE (no se impone) hasta que diga «Ya me la sé»
+  if(get("tour-visto") !== "2" || get("tour-chip") === "no" || $("tchip") || TOUR) return;
+  if(faltaConsent() || $("sheet") || $("gym")){ if((n || 0) < 40) setTimeout(function(){ tourChip((n || 0) + 1); }, 1500); return; }
+  var c = document.createElement("div"); c.id = "tchip"; c.className = "tchip"; c.setAttribute("role", "status");
+  c.innerHTML = '<span>¿Repaso rápido de la app?</span><button type="button" class="btn go" data-tour="ver">Ver</button><button type="button" class="btn ghost" data-tchip="no">Ya me la sé</button>';
+  document.body.appendChild(c); requestAnimationFrame(function(){ c.classList.add("on"); });
+  setTimeout(function(){ if(c.parentNode){ c.classList.remove("on"); setTimeout(function(){ c.remove(); }, 300); } }, 15000);
+}
 function tourVisible(el){ if(!el) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
 function tour(desde){
   var P = tourPasos();
+  var tc = $("tchip"); if(tc) tc.remove();
   if(!TOUR){
     var sh = $("sheet");
     if(sh && faltaConsent()) return; // 19 oct 2026: el recorrido NUNCA tapa ni cierra el consentimiento; sale después de aceptarlo
@@ -2808,6 +2824,7 @@ document.addEventListener("click", function(e){
   if(d.deshacer !== undefined){ if(_deshacer){ _deshacer.r(_deshacer.g); _deshacer = null; pintar(); } var tt = b.closest(".toast"); if(tt) tt.remove(); return; }
   if(d.info){ hojaInfo(d.info); return; }
   if(d.tour){ tourAccion(d.tour); return; }
+  if(d.tchip){ set("tour-chip", "no"); var tc2 = $("tchip"); if(tc2) tc2.remove(); toast("Va. Si la necesitas, está en el botón ? de arriba."); return; }
   if(d.infw){ INF_W = clamp(INF_W + (+d.infw), 0, NSEM - 1); return pintar(); }
   if(b.id === "ajustes") return hojaAjustes();
   if(d.cerrar !== undefined){ var s2 = $("sheet"); if(s2) s2.remove(); return; }
@@ -3195,6 +3212,7 @@ pintar();
 splash();
 if(get("tour-visto") !== "2") setTimeout(tourAuto, 1500); // «2» = ya vio el recorrido con foco; quien solo vio el de tarjetas lo recibe una vez
 else if(get("version-vista") !== VERSION) setTimeout(novedades, 1400);
+if(get("tour-visto") === "2") setTimeout(tourChip, 2200); // si hay novedades abiertas, la pastilla espera a que se cierren
 })();
 
 </script>
