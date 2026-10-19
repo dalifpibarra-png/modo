@@ -888,6 +888,7 @@ details.grp .grp-in .card{box-shadow:none}
 .tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 200vmax rgba(6,9,11,.74),0 0 0 3px var(--acc);pointer-events:none;transition:left .3s cubic-bezier(.2,.8,.2,1),top .3s cubic-bezier(.2,.8,.2,1),width .3s,height .3s,opacity .2s}
 .tour.sp .tour-c{position:fixed;left:50%;transform:translateX(-50%);width:min(400px,calc(100% - 32px));justify-items:start;text-align:left;gap:8px;padding:20px 18px 16px;animation:none;transition:top .3s,bottom .3s}
 .tour.sp.centro .tour-c{top:50%;transform:translate(-50%,-50%)}
+.tour.sp .tour-c>*{justify-self:stretch}
 .tour.sp .tour-c h3{font-size:1.25rem}
 .tour-n{font:700 .72rem var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)}
 .tour-b{width:100%;gap:8px;margin-top:4px}
@@ -972,7 +973,8 @@ function diasEntre(a, b){ return Math.round((b - a) / 86400000); }
 /* ── el programa ──────────────────────────────────────────────────────────── */
 var P = CFG.programa, DIAS = P.DIAS, EXTRA = P.EXTRA || {}, CAMBIO = P.CAMBIO || {}, ORDEN = P.ORDEN || {},
     OPCIONAL = P.OPCIONAL || {}, AJUSTE = P.AJUSTE || {}, AJUSTE_SEM = P.AJUSTE_SEM || 0, TUT = P.TUT || {},
-    DELOAD_W = (P.DELOAD_W === undefined || P.DELOAD_W === null) ? -1 : P.DELOAD_W;
+    DELOAD_W = (P.DELOAD_W === undefined || P.DELOAD_W === null) ? -1 : P.DELOAD_W,
+    UNIEX = P.UNIEX || {}, PASO = P.PASO || {}, APROX = P.APROX || {}; // APROX: la aproximación propia de un ejercicio, escrita // 19 oct 2026: unidad y escalón por ejercicio («d0-e1»), para quien anota kg en barra, lb en mancuerna y placas en máquina
 // el demo siempre se ve a media semana del programa, se abra cuando se abra
 if(CFG.demo && CFG.demo.semana){ P.inicio = iso(masDias(masDias(HOY, -dowL(HOY)), -7 * CFG.demo.semana)); }
 var INI = deIso(P.inicio), NSEM = P.semanas;
@@ -1022,9 +1024,12 @@ function seriesDe(w, i, k, pres){
 function nombre(x){ return String(x[0]).replace("⭐ ", "").replace(/^A[12] · /, ""); }
 function corto(x){ return nombre(x).replace(/\s*\(.*?\)\s*/g, " ").split(" · ")[0].trim(); }
 function segDescanso(t){ t = String(t); var m = t.match(/(\d+(?:\.\d+)?)\s*(?:[–-]\s*\d+(?:\.\d+)?)?\s*min/); if(m) return Math.round(parseFloat(m[1]) * 60); m = t.match(/(\d+)\s*s\b/); return m ? +m[1] : 0; }
-function escalon(x){ return UNI === "kg" ? Math.ceil(x / 2.5) * 2.5 : Math.ceil(x / 5) * 5; }
-function escalonAbajo(x){ var st = UNI === "kg" ? 2.5 : 5, y = Math.floor(x * 0.95 / st) * st; if(y >= x) y = x - st; return Math.max(st, y); }
-function parseHit(s){ var t = String(s).replace(/<[^>]+>/g, ""), w = t.match(/(\d+(?:\.\d+)?)\s*(?:lb|kg)/), r = t.match(/(\d+(?:\s*,\s*\d+)+)/); return { w: w ? +w[1] : null, reps: r ? r[1].split(/\s*,\s*/).map(Number) : [] }; }
+function uniEx(i, k){ return UNIEX["d" + i + "-e" + k] || UNI; }
+function fmtW(w, u){ return u === "placa" ? "placa " + w : w + " " + u; }
+function pasoEx(i, k){ var p = PASO["d" + i + "-e" + k]; return p ? +p : (uniEx(i, k) === "kg" ? 2.5 : uniEx(i, k) === "placa" ? 1 : 5); }
+function escalon(x, i, k){ var st = i === undefined ? (UNI === "kg" ? 2.5 : 5) : pasoEx(i, k); return Math.ceil(x / st) * st; }
+function escalonAbajo(x, i, k){ var st = i === undefined ? (UNI === "kg" ? 2.5 : 5) : pasoEx(i, k), y = Math.floor(x * 0.95 / st) * st; if(y >= x) y = x - st; return Math.max(st, y); }
+function parseHit(s){ var t = String(s).replace(/<[^>]+>/g, ""), w = t.match(/(\d+(?:\.\d+)?)\s*(?:lb|kg)/) || t.match(/placas?\s*(\d+(?:\.\d+)?)/i), r = t.match(/(\d+(?:\s*,\s*\d+)+)/); return { w: w ? +w[1] : null, reps: r ? r[1].split(/\s*,\s*/).map(Number) : [] }; }
 function ultimaVez(i, k, w){
   var actual = (ejerciciosDe(i, w)[k] || [""])[0];
   for(var v = w - 1; v >= 0; v--){ if(esDeload(v)) continue; var x = ejerciciosDe(i, v)[k]; if(!x || x[0] !== actual) continue; var s = seriesDe(v, i, k, x[1]); if(s.length) return { w: v, s: s }; }
@@ -1044,23 +1049,23 @@ function objetivo(i, k, x, w){
   }
   var u = ultimaVez(i, k, w);
   if(!u) return { lbl:"Primera vez", hit: rg ? rg.lo + " a " + rg.hi + " reps" : x[1], t:"keep", w:null, reps:[], why:"Sin registro previo: elige un peso que te deje dentro del rango en todas las series." };
-  var rr = u.s.map(function(z){ return z.r; }), pw = u.s[0].w, antes = (pw ? pw + " " + UNI + " · " : "") + rr.join(",");
+  var rr = u.s.map(function(z){ return z.r; }), pw = u.s[0].w, UX = uniEx(i, k), antes = (pw ? fmtW(pw, UX) + " · " : "") + rr.join(",");
   if(!rg) return { lbl:"Hoy · calculado", hit: antes, t:"keep", w: pw || null, reps: rr, why:"Repite lo de la semana " + (u.w + 1) + " y suma un poco de tiempo o de peso." };
   var def = suma(rr.map(function(r){ return Math.max(0, rg.lo - r); }));
   if(rr.length >= rg.n && rr.every(function(r){ return r >= rg.hi; })){
-    var nw = pw ? escalon(pw * 1.05) : null, m = Math.round((rg.lo + rg.hi) / 2), reps = [];
+    var nw = pw ? escalon(pw * 1.05, i, k) : null, m = Math.round((rg.lo + rg.hi) / 2), reps = [];
     for(var j = 0; j < rg.n; j++) reps.push(Math.max(rg.lo, m - j));
-    return { lbl:"Hoy · calculado", t:"up", w: nw, reps: reps, hit:"SUBE · " + (nw ? nw + " " + UNI + " · " : "") + reps.join(","), why:"La semana " + (u.w + 1) + " llegaste al tope (" + antes + "). Sube y las reps vuelven al centro del rango." };
+    return { lbl:"Hoy · calculado", t:"up", w: nw, reps: reps, hit:"SUBE · " + (nw ? fmtW(nw, UX) + " · " : "") + reps.join(","), why:"La semana " + (u.w + 1) + " llegaste al tope (" + antes + "). Sube y las reps vuelven al centro del rango." };
   }
   if(def >= 3 && pw){
     // 18 oct 2026: la retro decía «baja un escalón» y la semana siguiente pedía el mismo peso. Ahora las dos dicen lo mismo.
-    var bw = escalonAbajo(pw), br = [];
+    var bw = escalonAbajo(pw, i, k), br = [];
     for(var jb = 0; jb < rg.n; jb++) br.push(Math.min(rg.hi, Math.max(rg.lo, rg.lo + 2 - jb)));
-    return { lbl:"Hoy · calculado", t:"chg", w: bw, reps: br, hit:"BAJA · " + bw + " " + UNI + " · " + br.join(","), why:"La semana " + (u.w + 1) + " quedaste " + def + " repeticiones abajo del rango (" + antes + "). Baja un escalón para que entren las " + rg.n + " series completas; desde ahí vuelves a subir." };
+    return { lbl:"Hoy · calculado", t:"chg", w: bw, reps: br, hit:"BAJA · " + fmtW(bw, UX) + " · " + br.join(","), why:"La semana " + (u.w + 1) + " quedaste " + def + " repeticiones abajo del rango (" + antes + "). Baja un escalón para que entren las " + rg.n + " series completas; desde ahí vuelves a subir." };
   }
   var nr = [];
   for(var q = 0; q < rg.n; q++){ var b0 = rr[q] !== undefined ? rr[q] : rr[rr.length - 1]; nr.push(def >= 3 ? Math.max(b0, rg.lo) : Math.min(rg.hi, b0 + 1)); }
-  return { lbl:"Hoy · calculado", t: def >= 3 ? "chg" : "keep", w: pw || null, reps: nr, hit:(pw ? pw + " " + UNI + " · " : "") + nr.join(","),
+  return { lbl:"Hoy · calculado", t: def >= 3 ? "chg" : "keep", w: pw || null, reps: nr, hit:(pw ? fmtW(pw, UX) + " · " : "") + nr.join(","),
     why: def >= 3 ? "La semana " + (u.w + 1) + " quedaste bajo el rango (" + antes + "). Mismo peso, descanso completo, y que todas lleguen a " + rg.lo + "." : "La semana " + (u.w + 1) + ": " + antes + ". Mismo peso, una repetición más por serie." };
 }
 
@@ -1077,7 +1082,7 @@ function analizar(i, w){
     R.nSer += rr.length; R.en += rr.filter(function(r){ return r >= rg.lo && r <= rg.hi; }).length;
     var def = suma(rr.map(function(r){ return Math.max(0, rg.lo - r); })), ob = objetivo(i, k, x, w), meta = ob.reps.slice(0, rr.length);
     if(rr.length < rg.n && !opc) R.hall.push({ s: 40 * (rg.n - rr.length), t:"<b>" + esc(nom) + "</b>: " + (rg.n - rr.length === 1 ? "faltó una serie" : "faltaron " + (rg.n - rr.length) + " series") + ". Va antes que cualquier opcional." });
-    if(rr.length >= rg.n && rr.every(function(r){ return r >= rg.hi; })){ R.sube.push(nom + (s[0].w ? " a " + escalon(s[0].w * 1.05) : "")); R.bien.push({ s:30, t:"<b>" + esc(nom) + "</b> " + txt + ", tope del rango" }); }
+    if(rr.length >= rg.n && rr.every(function(r){ return r >= rg.hi; })){ R.sube.push(nom + (s[0].w ? " a " + escalon(s[0].w * 1.05, i, k) : "")); R.bien.push({ s:30, t:"<b>" + esc(nom) + "</b> " + txt + ", tope del rango" }); }
     else if(meta.length && s[0].w >= (ob.w || 0) && suma(rr) > suma(meta)) R.bien.push({ s: 20 + suma(rr) - suma(meta), t:"<b>" + esc(nom) + "</b> " + txt + ", arriba de lo pedido" });
     else if(meta.length && suma(rr) === suma(meta) && rr.length >= rg.n) R.bien.push({ s:10, t:"<b>" + esc(nom) + "</b> " + txt + ", exacto" });
     if(def >= 3){ R.baja.push(nom); R.hall.push({ s: def * 8, t:"<b>" + esc(nom) + "</b> " + txt + ": " + def + " reps bajo el rango. El peso está alto, baja un escalón hasta que entren las " + rg.n + "." }); }
@@ -1322,7 +1327,7 @@ function tarjeta(i, k, vis){
     '<p class="hit" data-t="' + ob.t + '"><small>' + ob.lbl + '</small>' + ob.hit + '</p><div class="ex-b">' +
     '<p class="meta"><span>' + esc(x[1]) + ' · RPE ' + esc(x[2]) + (vis === 0 ? ' ' + infoBtn("rpe") : '') + '</span>' + (sd ? '<button type="button" class="rest" data-s="' + sd + '" data-l="' + esc(corto(x)) + '">' + ic("reloj", 14) + ' ' + esc(x[3]) + '</button>' : '') + (rec ? '<span class="pill gold">' + ic("trofeo", 13) + ' Récord: ' + rec.w + '×' + rec.r + '</span>' : '') + '</p>' +
     (uv ? '<p class="ultima">Última vez (sem ' + (uv.w + 1) + '): <b>' + uv.s.map(function(z){ return (z.w ? z.w + '×' : '') + z.r; }).join(" · ") + '</b></p>' : '') +
-    (vis === 0 && ob.w ? '<p class="ultima">' + ic("rayo", 13) + ' Aproximación: <b>' + aproximacion(ob.w) + '</b></p>' : '') +
+    (vis === 0 && (ob.w || APROX["d" + i + "-e" + k]) ? '<p class="ultima">' + ic("rayo", 13) + ' Aproximación: <b>' + esc(APROX["d" + i + "-e" + k] || aproximacion(ob.w, i, k)) + '</b></p>' : '') +
     (dsc ? '<p class="ultima">' + ic("disco", 13) + ' Por lado: <b>' + dsc.join(" + ") + ' ' + UNI + '</b> (barra de ' + (UNI === "kg" ? 20 : 45) + ')</p>' : '') +
     '<details><summary>Por qué y técnica</summary><div class="body"><p>' + ob.why + '</p><p>' + limpia(altO && altO.t ? altO.t : (x[4] || "")) + '</p></div></details>' +
     (alts.length ? '<details><summary>¿No te gusta o no hay máquina? Cámbialo</summary><div class="body"><div class="chips">' + (altO ? '<button type="button" data-alt="' + altK + '" data-v="">↩ ' + esc(nombre(x)) + '</button>' : '') + alts.filter(function(z){ return z !== altO; }).map(function(z){ return '<button type="button" data-alt="' + altK + '" data-v="' + esc(z.n) + '">' + esc(z.n) + '</button>'; }).join("") + '</div><p class="tiny">Mismo músculo, mismas series y repeticiones. Tus registros siguen en su lugar.</p></div></details>' : '') +
@@ -1699,7 +1704,7 @@ function hojaAjustes(){
     '<div><span class="lbl">Descanso automático al anotar las reps</span><div class="chips" style="margin-top:6px">' + [["1","Sí"],["0","No"]].map(function(x){ return '<button type="button" data-adesc data-v="' + x[0] + '" aria-pressed="' + ((get("autoDesc") || "1") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div>' +
     '</div></details>' +
     '<details class="aj-d"><summary>🎨 Hazla tuya</summary><div class="aj-in">' +
-      '<div><span class="lbl">Color de tu app</span><div class="chips colores" style="margin-top:6px">' + Object.keys(ACENTOS).map(function(k){ return '<button type="button" data-acento="' + k + '" aria-pressed="' + ((get("acento") || "modo") === k) + '"><i style="background:' + ACENTOS[k][1] + '"></i>' + ACENTOS[k][0] + '</button>'; }).join("") + '</div></div>' +
+      '<div><span class="lbl">Color de tu app</span><div class="chips colores" style="margin-top:6px">' + Object.keys(ACENTOS).map(function(k){ return '<button type="button" data-acento="' + k + '" aria-pressed="' + ((get("acento") || CFG.acento || "modo") === k) + '"><i style="background:' + ACENTOS[k][1] + '"></i>' + ACENTOS[k][0] + '</button>'; }).join("") + '</div></div>' +
       '<label class="f"><span>¿Cómo te digo?</span><input type="text" id="aj-apodo" maxlength="24" value="' + esc(get("apodo") || "") + '" placeholder="' + esc(CFG.nombre) + '"></label>' +
       '<label class="f"><span>Tu frase (sale en Hoy cada día)</span><input type="text" id="aj-frase" maxlength="90" value="' + esc(get("frase") || "") + '" placeholder="Ej. Disciplina > motivación"></label>' +
       '<div><span class="lbl">Tamaño de letra</span><div class="chips" style="margin-top:6px">' + [["n","Normal"],["g","Grande"]].map(function(x){ return '<button type="button" data-letra="' + x[0] + '" aria-pressed="' + ((get("letra") || "n") === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div></div></div></details>' +
@@ -1753,7 +1758,7 @@ function vibra(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms || 12); }cat
 
 /* El orden importa: lo más específico primero (curl femoral antes que curl,
    jalón de tríceps antes que jalón). */
-var MUSC = [[/tr[ií]ceps|franc[eé]s|fondos/i,"Tríceps"],[/curl de muñeca/i,"Antebrazo"],[/curl femoral|femoral/i,"Femoral"],[/curl/i,"Bíceps"],[/inclinad/i,"Pecho alto"],[/press de pecho|cruce de poleas|banca plana|lagartija/i,"Pecho"],[/lateral/i,"Hombro lateral"],[/face pull|cruce inverso|p[aá]jaro/i,"Hombro posterior"],[/press de hombro|arnold/i,"Hombro"],[/jal[oó]n|remo|pullover|dominada/i,"Espalda"],[/hip thrust|abducci|puente|patada|zancada/i,"Glúteo"],[/hack|sentadilla|prensa|cu[aá]driceps|b[uú]lgara|sissy/i,"Cuádriceps"],[/rumano|hiperextensi/i,"Femoral y glúteo"],[/tal[oó]n|gemelo|s[oó]leo/i,"Pantorrilla"],[/rueda|plancha|dead bug/i,"Core"],[/granjero|sost[eé]n/i,"Agarre"],[/encogimiento/i,"Trapecio"],[/tibial/i,"Tibial"]];
+var MUSC = [[/aductor/i,"Aductor"],[/extensi[oó]n de cadera|patada/i,"Glúteo"],[/p[eé]ndulo|step ?up/i,"Cuádriceps"],[/pantorrilla/i,"Pantorrilla"],[/bird dog/i,"Core"],[/rotaci[oó]n externa|apertura inversa/i,"Hombro posterior"],[/tr[ií]ceps|franc[eé]s|fondos/i,"Tríceps"],[/curl de muñeca/i,"Antebrazo"],[/curl femoral|femoral/i,"Femoral"],[/curl/i,"Bíceps"],[/inclinad/i,"Pecho alto"],[/press de pecho|cruce de poleas|banca plana|lagartija/i,"Pecho"],[/lateral/i,"Hombro lateral"],[/face pull|cruce inverso|p[aá]jaro/i,"Hombro posterior"],[/press de hombro|arnold/i,"Hombro"],[/jal[oó]n|remo|pullover|dominada/i,"Espalda"],[/hip thrust|abducci|puente|patada|zancada/i,"Glúteo"],[/hack|sentadilla|prensa|cu[aá]driceps|b[uú]lgara|sissy/i,"Cuádriceps"],[/rumano|hiperextensi/i,"Femoral y glúteo"],[/tal[oó]n|gemelo|s[oó]leo/i,"Pantorrilla"],[/rueda|plancha|dead bug/i,"Core"],[/granjero|sost[eé]n/i,"Agarre"],[/encogimiento/i,"Trapecio"],[/tibial/i,"Tibial"]];
 function musculo(n){ for(var q = 0; q < MUSC.length; q++) if(MUSC[q][0].test(n)) return MUSC[q][1]; return "General"; }
 function musculosDelDia(i, w){
   var c = {};
@@ -1873,10 +1878,11 @@ function discos(total){
   var out = []; P.forEach(function(p){ while(lado >= p - 0.001){ out.push(p); lado -= p; } });
   return out.length ? out : null;
 }
-function aproximacion(w){
+function aproximacion(w, i, k){
   if(!(w > 0)) return "";
-  function r(x){ return UNI === "kg" ? Math.round(x / 2.5) * 2.5 : Math.round(x / 5) * 5; }
-  return '8 × ' + r(w * .4) + ' · 4 × ' + r(w * .6) + ' · 2 × ' + r(w * .8) + ' ' + UNI;
+  var st = i === undefined ? (UNI === "kg" ? 2.5 : 5) : pasoEx(i, k), u = i === undefined ? UNI : uniEx(i, k); // con el escalón real del ejercicio: nada de 87.5 kg donde el disco más chico es de 5
+  function r(x){ return Math.max(st, Math.round(x / st) * st); }
+  return '8 × ' + r(w * .4) + ' · 4 × ' + r(w * .6) + ' · 2 × ' + r(w * .8) + ' ' + u;
 }
 
 /* ── el festejo al terminar ── */
@@ -1935,7 +1941,7 @@ function gymAbrir(){
 }
 function gymPintar(){
   var el = $("gym"); if(!el){ el = document.createElement("div"); el.id = "gym"; el.className = "gym"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Modo gym"); document.body.appendChild(el); requestAnimationFrame(function(){ el.classList.add("on"); }); }
-  var E = gymEj(), x = E.x, nom = nombre(x), uv = ultimaVez(DIA, E.k, WK), sd = segDescanso(x[3]) || 90, step = UNI === "kg" ? 2.5 : 5;
+  var E = gymEj(), x = E.x, nom = nombre(x), uv = ultimaVez(DIA, E.k, WK), sd = segDescanso(x[3]) || 90, step = pasoEx(DIA, E.k), UG = uniEx(DIA, E.k);
   var hechas = gymSerie(E), todo = GYM.orden.every(function(k, q){ var b = base(WK, DIA, k), xx = ejerciciosDe(DIA, WK)[k]; return esOpcional(DIA, k, WK) || seriesDe(WK, DIA, k, xx[1]).length >= nSeries(xx[1]); });
   var dots = GYM.orden.map(function(k, q){ var xx = ejerciciosDe(DIA, WK)[k], s = seriesDe(WK, DIA, k, xx[1]).length, ok = s >= nSeries(xx[1]); return '<i class="' + (q === GYM.idx ? 'cur' : ok ? 'ok' : s ? 'part' : '') + (esOpcional(DIA, k, WK) ? ' opc' : '') + '"></i>'; }).join("");
   var setsH = ''; for(var j = 0; j < E.n; j++){ var w0 = get(E.b + "-s" + j + "-w"), r0 = get(E.b + "-s" + j + "-r"), ok = parseInt(r0, 10) > 0; setsH += '<button type="button" data-g="ir" data-j="' + j + '" class="' + (ok ? 'ok' : '') + (j === GYM.j && GYM.fase === "serie" ? ' cur' : '') + '"><span>S' + (j + 1) + '</span><b>' + (ok ? (w0 ? w0 + '×' : '') + r0 : (E.ob.reps[j] ? '· ' + E.ob.reps[j] : '·')) + '</b></button>'; }
@@ -1947,11 +1953,11 @@ function gymPintar(){
   } else if(GYM.fase === "descanso"){
     var sig = gymEj(), sj = gymSerie(sig);
     h += '<div class="g-desc"><svg viewBox="0 0 200 200" width="220" height="220" aria-hidden="true"><circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/><circle id="g-ring" cx="100" cy="100" r="86" fill="none" stroke="#7C9DF5" stroke-width="12" stroke-linecap="round" transform="rotate(-90 100 100)"/></svg><div class="g-t"><b id="g-t">0:00</b><span>descanso</span></div>' +
-      '<p class="g-sig">Sigue: ' + (sj < sig.ns ? 'serie ' + (sj + 1) + (sig.ob.reps[sj] ? ' · ' + (sig.ob.w ? sig.ob.w + ' ' + UNI + ' × ' : '') + sig.ob.reps[sj] : '') : 'siguiente ejercicio') + '</p>' +
+      '<p class="g-sig">Sigue: ' + (sj < sig.ns ? 'serie ' + (sj + 1) + (sig.ob.reps[sj] ? ' · ' + (sig.ob.w ? sig.ob.w + ' ' + uniEx(DIA, sig.k) + ' × ' : '') + sig.ob.reps[sj] : '') : 'siguiente ejercicio') + '</p>' +
       '<div class="g-row"><button type="button" class="btn ghost" data-g="d-">−15 s</button><button type="button" class="btn go" data-g="saltar">Saltar</button><button type="button" class="btn ghost" data-g="d+">+15 s</button></div>' + (gymSerie(E) >= E.ns ? fbEjercicioHTML(E.b, corto(x)) : '') + '</div>';
   } else {
     h += '<div class="g-serie"><p class="lbl">Serie ' + (GYM.j + 1) + ' de ' + E.ns + (GYM.j >= E.ns ? ' (extra)' : '') + '</p>' +
-      '<div class="g-step"><span>Peso</span><button type="button" data-g="w-" aria-label="Menos peso">−</button><b>' + (GYM.w || 0) + '<small>' + UNI + '</small></b><button type="button" data-g="w+" aria-label="Más peso">+</button></div>' +
+      '<div class="g-step"><span>Peso</span><button type="button" data-g="w-" aria-label="Menos peso">−</button><b>' + (GYM.w || 0) + '<small>' + UG + '</small></b><button type="button" data-g="w+" aria-label="Más peso">+</button></div>' +
       '<div class="g-step"><span>Reps</span><button type="button" data-g="r-" aria-label="Una repetición menos">−</button><b>' + GYM.r + '</b><button type="button" data-g="r+" aria-label="Una repetición más">+</button></div>' +
       (E.rg ? '<p class="g-rg">Rango ' + E.rg.lo + ' a ' + E.rg.hi + ' · RPE ' + esc(x[2]) + ' · descanso ' + esc(x[3]) + '</p>' : '') +
       '<button type="button" class="btn go wide g-ok" data-g="hecha">' + ic("check", 22) + ' Serie hecha</button></div>';
@@ -1980,7 +1986,7 @@ function gymSigue(){
   GYM.fase = "serie"; GYM.j = Math.min(gymSerie(E), E.n - 1); if(GYM.j < 0) GYM.j = 0; gymValores(E); gymPintar();
 }
 function gymAccion(a, b){
-  var E = gymEj(), step = UNI === "kg" ? 2.5 : 5, p = "w" + WK + "-d" + DIA + "-";
+  var E = gymEj(), step = pasoEx(DIA, E.k), p = "w" + WK + "-d" + DIA + "-";
   if(a === "cerrar"){ var el = $("gym"); if(el) el.remove(); GYM = null; pintar(); return; }
   if(a === "w-"){ GYM.w = Math.max(0, r1(GYM.w - step)); } else if(a === "w+"){ GYM.w = r1(GYM.w + step); }
   else if(a === "r-"){ GYM.r = Math.max(0, GYM.r - 1); } else if(a === "r+"){ GYM.r = GYM.r + 1; }
@@ -2585,7 +2591,7 @@ function tourPasos(){
   return [
     { t:"Hola, " + nom, p:"Te enseño tu app en 30 segundos. Toca «Siguiente»; si tienes prisa, sáltalo y lo vuelves a ver cuando quieras con el botón «?» de arriba." },
     { v:"hoy", sel:'#nav [data-v="hoy"]', t:"Hoy", p:"Tu día completo: qué entrenas, qué comes y tus hábitos. Cada hábito que cumples llena un disco de la barra." },
-    { v:"hoy", sel:".resumen-btn", opt:1, t:"Tu semana en resumen", p:"Cada semana " + (cli ? "tu coach te deja" : "llega") + " tu retro: lo que hiciste increíble, qué mejorar y qué toca. Aquí la ves completa." },
+    { v:"hoy", sel:"[data-semdet]", opt:1, t:"Tu semana en resumen", p:"Cada semana " + (cli ? "tu coach te deja" : "llega") + " tu retro: lo que hiciste increíble, qué mejorar y qué toca. Aquí la ves completa." },
     { v:"entreno", sel:'#nav [data-v="entreno"]', t:"Entreno", p:"La sesión de hoy, ejercicio por ejercicio, con el peso y las repeticiones que te tocan. Anota cada serie al terminarla." },
     { v:"entreno", sel:".gym-btn", opt:1, t:"Modo gym", p:"Un ejercicio a la vez y en grande. Marcas la serie con un toque y el descanso arranca solo." },
     { v:"comida", sel:'#nav [data-v="comida"]', t:"Comida", p:"Tu plan del día. Marca lo que comiste y agrega lo que comas fuera del plan." },
@@ -2597,10 +2603,21 @@ function tourPasos(){
     { sel:"#recorrido", t:"¿Se te olvidó algo?", p:"Toca aquí y vuelves a ver este recorrido cuando quieras. ¡A darle!" }
   ];
 }
+function faltaConsent(){ return !CFG.demo && CFG.rol === "cliente" && !CFG.propio && !get("consentimiento"); }
+function tourAuto(n){ // primera vez: espera a que no haya nada abierto (consentimiento, resumen del viernes) y entonces arranca
+  if(get("tour-visto") === "2" || TOUR || $("tour") || (n || 0) > 80) return;
+  if(faltaConsent() || $("sheet") || $("gym")) return setTimeout(function(){ tourAuto((n || 0) + 1); }, 1500);
+  tour(0);
+}
 function tourVisible(el){ if(!el) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
 function tour(desde){
   var P = tourPasos();
-  if(!TOUR){ TOUR = { i: desde || 0, vista: VIEW }; var sh = $("sheet"); if(sh) sh.remove(); }
+  if(!TOUR){
+    var sh = $("sheet");
+    if(sh && faltaConsent()) return; // 19 oct 2026: el recorrido NUNCA tapa ni cierra el consentimiento; sale después de aceptarlo
+    if(sh) sh.remove();
+    TOUR = { i: desde || 0, vista: VIEW };
+  }
   var p = P[TOUR.i], el = $("tour");
   if(!el){
     el = document.createElement("div"); el.id = "tour"; el.className = "tour sp"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "Recorrido rápido de la app");
@@ -2616,8 +2633,11 @@ function tourColoca(){
   var tg = p.sel ? document.querySelector(p.sel) : null;
   if(tg && !tourVisible(tg)) tg = null;
   if(!tg && p.opt){ var ni = TOUR.i + (TOUR.dir || 1); if(ni >= 0 && ni < P.length){ TOUR.i = ni; return tour(); } } // ese botón no existe hoy (día de descanso, sin resumen): se salta
-  if(tg && tg.closest("main")) tg.scrollIntoView({ block:"center" });
-  var hole = el.querySelector(".tour-hole"), card = el.querySelector(".tour-c"), W = innerWidth, H = innerHeight;
+  var hole = el.querySelector(".tour-hole"), card = el.querySelector(".tour-c"), H = innerHeight;
+  if(tg && tg.closest("main") && !TOUR.scr){ // primero se acomoda la página (sin animación) y luego se mide: si no, la tarjeta cae donde estaba el botón
+    var r0 = tg.getBoundingClientRect();
+    if(r0.top < 110 || r0.bottom > H - 230){ TOUR.scr = 1; window.scrollTo({ top: Math.max(0, scrollY + r0.top - H * 0.3), behavior: "instant" }); return setTimeout(function(){ if(TOUR){ tourColoca(); TOUR.scr = 0; } }, 90); }
+  }
   card.innerHTML = '<p class="tour-n">' + (i + 1) + ' de ' + P.length + '</p><h3>' + esc(p.t) + '</h3><p>' + esc(p.p) + '</p>' +
     '<div class="tour-dots">' + P.map(function(_, n){ return '<i class="' + (n === i ? 'on' : '') + '"></i>'; }).join("") + '</div>' +
     '<div class="row tour-b"><button type="button" class="btn ghost" data-tour="saltar">' + (i === P.length - 1 ? 'Cerrar' : 'Saltar') + '</button><span class="grow"></span>' +
@@ -3103,10 +3123,10 @@ var MOV_SOFT = false; try{ MOV_SOFT = matchMedia("(prefers-reduced-motion: reduc
 /* ── personalización (18 oct 2026): cada cliente ajusta su app a su gusto ── */
 var ACENTOS = { modo: ["MODO", "#1F4FD8", "#E2E9FB", "#7C9DF5", "#18233F"], verde: ["Verde", "#1C7A46", "#DDF0E5", "#5CC48A", "#12271B"], rojo: ["Rojo", "#C8352B", "#F8E1DF", "#F07A70", "#2E1614"], morado: ["Morado", "#6B4FD8", "#E8E3FA", "#A894F5", "#201A3A"], naranja: ["Naranja", "#B95A16", "#F8E7D8", "#F0A060", "#2E1E10"], rosa: ["Rosa", "#C2306E", "#F7E0EA", "#F07AAA", "#2E1520"] };
 function aplicaEstilo(){
-  var a = ACENTOS[get("acento")], st = $("estilo-cliente");
+  var ak = get("acento") || CFG.acento, a = ACENTOS[ak], st = $("estilo-cliente"); // CFG.acento: el color de fábrica de esa clienta (19 oct 2026)
   if(!st){ st = document.createElement("style"); st.id = "estilo-cliente"; document.head.appendChild(st); }
   // :root:root sube la especificidad: el CSS de la app va en el body y le ganaría a un :root simple
-  st.textContent = a && get("acento") !== "modo" ? ':root:root{--acc:' + a[1] + ';--acc-w:' + a[2] + ';--acc-ink:#FFFFFF}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){--acc:' + a[3] + ';--acc-w:' + a[4] + ';--acc-ink:#0E1215}}:root:root[data-theme="dark"]{--acc:' + a[3] + ';--acc-w:' + a[4] + ';--acc-ink:#0E1215}' : '';
+  st.textContent = a && ak !== "modo" ? ':root:root{--acc:' + a[1] + ';--acc-w:' + a[2] + ';--acc-ink:#FFFFFF}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){--acc:' + a[3] + ';--acc-w:' + a[4] + ';--acc-ink:#0E1215}}:root:root[data-theme="dark"]{--acc:' + a[3] + ';--acc-w:' + a[4] + ';--acc-ink:#0E1215}' : '';
   document.documentElement.style.fontSize = get("letra") === "g" ? "112.5%" : "";
 }
 aplicaEstilo();
@@ -3173,7 +3193,7 @@ $("nav").addEventListener("click", function(){});
 $("nav").setAttribute("data-marca", String(CFG.marca || "Método Dalí").replace(/<[^>]+>/g, "")); // la marca encabeza el menú lateral en pantalla grande
 pintar();
 splash();
-if(get("tour-visto") !== "2") setTimeout(function(){ tour(0); }, 1500); // «2» = ya vio el recorrido con foco; quien solo vio el de tarjetas lo recibe una vez
+if(get("tour-visto") !== "2") setTimeout(tourAuto, 1500); // «2» = ya vio el recorrido con foco; quien solo vio el de tarjetas lo recibe una vez
 else if(get("version-vista") !== VERSION) setTimeout(novedades, 1400);
 })();
 
