@@ -1,4 +1,4 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0E1215"><meta name="description" content="Tu programa de entrenamiento."><meta property="og:title" content="Método Dalí"><meta property="og:description" content="Tu programa de entrenamiento."><meta property="og:image" content="https://dalifpibarra-png.github.io/modo/img/og.jpg"><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" href="../../icon-192.png"><link rel="apple-touch-icon" href="../../icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Método Dalí"><style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>Método Dalí · Xcaret</title>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0E1215"><meta name="description" content="Tu programa de entrenamiento."><meta property="og:title" content="Método Dalí"><meta property="og:description" content="Tu programa de entrenamiento."><meta property="og:image" content="https://dalifpibarra-png.github.io/modo/img/og.jpg"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="../../icon-192.png"><link rel="apple-touch-icon" href="../../icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Método Dalí"><style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style></head><body><title>Método Dalí · Xcaret</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
@@ -947,7 +947,11 @@ var NS = CFG.ns, MEM = {};
 (function(){
   try{
     var h = location.hash || "", m = /^#llave-([A-Za-z0-9_-]{16,})$/.exec(h);
-    if(m){ localStorage.setItem(NS + "llave", m[1]); history.replaceState(null, "", location.pathname + location.search + "#hoy"); }
+    // 19 oct 2026: la llave se queda en la dirección como ?k= (antes se borraba). «Agregar a inicio» guarda la dirección
+    // que está en la barra, y en iPhone la app instalada NO comparte memoria con Safari: sin ?k= abría sin perfil.
+    var q = /[?&]k=([A-Za-z0-9_-]{16,})/.exec(location.search), ll = m ? m[1] : q ? q[1] : null;
+    if(ll) localStorage.setItem(NS + "llave", ll); else ll = localStorage.getItem(NS + "llave");
+    if(ll && (m || !q)) history.replaceState(null, "", location.pathname + "?k=" + ll + (m ? "#hoy" : location.hash));
     var pc = localStorage.getItem(NS + "perfil-cache");
     if(pc){ var o = JSON.parse(pc); Object.keys(o).forEach(function(k){ CFG[k] = o[k]; }); CFG._privado = true; }
   }catch(e){}

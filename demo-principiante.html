@@ -947,7 +947,11 @@ var NS = CFG.ns, MEM = {};
 (function(){
   try{
     var h = location.hash || "", m = /^#llave-([A-Za-z0-9_-]{16,})$/.exec(h);
-    if(m){ localStorage.setItem(NS + "llave", m[1]); history.replaceState(null, "", location.pathname + location.search + "#hoy"); }
+    // 19 oct 2026: la llave se queda en la dirección como ?k= (antes se borraba). «Agregar a inicio» guarda la dirección
+    // que está en la barra, y en iPhone la app instalada NO comparte memoria con Safari: sin ?k= abría sin perfil.
+    var q = /[?&]k=([A-Za-z0-9_-]{16,})/.exec(location.search), ll = m ? m[1] : q ? q[1] : null;
+    if(ll) localStorage.setItem(NS + "llave", ll); else ll = localStorage.getItem(NS + "llave");
+    if(ll && (m || !q)) history.replaceState(null, "", location.pathname + "?k=" + ll + (m ? "#hoy" : location.hash));
     var pc = localStorage.getItem(NS + "perfil-cache");
     if(pc){ var o = JSON.parse(pc); Object.keys(o).forEach(function(k){ CFG[k] = o[k]; }); CFG._privado = true; }
   }catch(e){}
