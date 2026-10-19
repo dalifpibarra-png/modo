@@ -81,6 +81,10 @@ h1,h2,h3{font-family:var(--display);text-wrap:balance;letter-spacing:-.01em}
 #sync[data-s="ok"]{background:var(--ok)} #sync[data-s="err"]{background:var(--bad)}
 .demo-band{background:var(--warn-w);border:1px solid var(--warn);color:var(--ink);border-radius:var(--r-s);padding:8px 12px;font-size:.84rem;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
 .aviso{background:var(--warn-w);border:1px solid var(--warn);border-radius:var(--r-s);padding:10px 12px;font-size:.88rem;margin-bottom:10px}
+/* 19 oct 2026 · versión suave: discreta, no compite con «Modo gym» */
+.suave-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:44px;margin:0 0 8px;background:none;border:1px dashed var(--line);border-radius:var(--r-s);color:var(--ink2);font:inherit;font-size:.88rem;cursor:pointer}
+.suave-btn b{color:var(--ink)}
+.aviso.suave-on{background:var(--sunk);border-color:var(--line)}
 
 /* ── sub-vistas (segmentado) ── */
 .seg{display:flex;gap:4px;background:var(--sunk);border-radius:12px;padding:4px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
@@ -998,12 +1002,19 @@ function semDeFecha(d){ return Math.floor(diasEntre(INI, d) / 7); }
 function diaDeFecha(d){ var x = dowL(d); for(var i = 0; i < DIAS.length; i++) if(dowDe(i) === x) return i; return -1; }
 
 function esDeload(w){ return w === DELOAD_W; }
+/* 19 oct 2026 · versión suave: para el día que no viene al 100 (síntomas del ciclo, mal sueño,
+   gripa). La fase del ciclo cambia poco la fuerza en promedio; los síntomas sí tumban sesiones y
+   varían mucho entre personas. Mismo peso, una serie menos, para con 3 en el tanque y NO cuenta
+   para subir ni bajar. La etiqueta es neutra a propósito: la liga del cliente es abierta. */
+function esSuave(w, i){ return !esDeload(w) && get("w" + w + "-d" + i + "-suave") === "1"; }
+function menosUna(t){ var m = String(t).match(/^\s*(\d+)(×.*)$/); return m ? Math.max(1, +m[1] - 1) + m[2] : t; }
 function mitadSeries(t){ var m = String(t).match(/^\s*(\d+)(×.*)$/); return m ? Math.ceil(+m[1] / 2) + m[2] : t; }
 function ejerciciosDe(i, w){
   var out = DIAS[i].e.slice(), ex = EXTRA[i];
   if(ex) ex.forEach(function(q){ if(w >= q.desde) out.push(q.e); });
   Object.keys(CAMBIO).forEach(function(ck){ var pk = ck.split("-"); if(+pk[0] === i && w >= CAMBIO[ck].desde && out[+pk[1]]) out[+pk[1]] = CAMBIO[ck].e; });
   if(esDeload(w)) out = out.map(function(x){ var y = x.slice(); y[1] = mitadSeries(x[1]); y[2] = "6–7"; return y; });
+  else if(esSuave(w, i)) out = out.map(function(x){ var y = x.slice(); y[1] = menosUna(x[1]); y[2] = "6–7"; return y; });
   return out;
 }
 function esOpcional(i, k, w){ return [].concat(OPCIONAL[i] || []).some(function(o){ return w >= o.desde && o.k.indexOf(k) !== -1; }); } // una regla o una lista de reglas por día
@@ -1043,7 +1054,7 @@ function escalonAbajo(x, i, k){ var st = i === undefined ? (UNI === "kg" ? 2.5 :
 function parseHit(s){ var t = String(s).replace(/<[^>]+>/g, ""), w = t.match(/(\d+(?:\.\d+)?)\s*(?:lb|kg)/) || t.match(/placas?\s*(\d+(?:\.\d+)?)/i), r = t.match(/(\d+(?:\s*,\s*\d+)+)/); return { w: w ? +w[1] : null, reps: r ? r[1].split(/\s*,\s*/).map(Number) : [] }; }
 function ultimaVez(i, k, w){
   var actual = (ejerciciosDe(i, w)[k] || [""])[0];
-  for(var v = w - 1; v >= 0; v--){ if(esDeload(v)) continue; var x = ejerciciosDe(i, v)[k]; if(!x || x[0] !== actual) continue; var s = seriesDe(v, i, k, x[1]); if(s.length) return { w: v, s: s }; }
+  for(var v = w - 1; v >= 0; v--){ if(esDeload(v) || esSuave(v, i)) continue; var x = ejerciciosDe(i, v)[k]; if(!x || x[0] !== actual) continue; var s = seriesDe(v, i, k, x[1]); if(s.length) return { w: v, s: s }; }
   return null;
 }
 /* Lo que toca hoy: manda la nota escrita de esa semana; si no hay, la doble
@@ -1051,6 +1062,12 @@ function ultimaVez(i, k, w){
 function objetivo(i, k, x, w){
   var rg = rango(x[1]);
   if(esDeload(w)) return { lbl:"Descarga", hit: x[1] + " · RPE 6 a 7", t:"keep", w:null, reps:[], why:"Mismo peso de la semana anterior, menos series y paras con 3 repeticiones en el tanque." };
+  if(esSuave(w, i)){
+    var us = ultimaVez(i, k, w), ajs = AJUSTE["d" + i + "-e" + k], sw = us ? us.s[0].w : (ajs ? parseHit(ajs[0]).w : null), top = us ? Math.max.apply(null, us.s.map(function(z){ return z.r; })) : 0, para = top ? Math.max(3, top - 3) : 0, nsv = nSeries(x[1]), rs = [];
+    for(var js = 0; js < nsv; js++) rs.push(para || "");
+    return { lbl:"Versión suave", t:"keep", w: sw, reps: para ? rs : [], hit: (sw ? fmtW(sw, uniEx(i, k)) + " · " : "") + nsv + (nsv === 1 ? " serie" : " series") + (para ? " · PARA EN " + para : " · RPE 6 a 7"),
+      why: (us ? "Es el peso que usaste la semana " + (us.w + 1) + ". " : sw ? "Es el peso de tu plan; si hoy pesa demasiado, baja un escalón. " : "") + "Hoy una serie menos y paras con 3 repeticiones en el tanque. Esta sesión no cuenta para subir ni bajar de peso." };
+  }
   var pw = planWeb(w), pa = pw && pw.ajustes && pw.ajustes["d" + i + "-e" + k];
   if(pa && pa[0]){ var pp = parseHit(pa[0]); return { lbl: "Coach · semana " + (w + 1), hit: esc(pa[0]), why: esc(pa[1] || ""), t: /SUBE/i.test(pa[0]) ? "up" : (/BAJA|CAMBIA|PRUEBA/i.test(pa[0]) ? "chg" : "keep"), w: pp.w, reps: pp.reps }; }
   var aj = AJUSTE["d" + i + "-e" + k];
@@ -1082,7 +1099,7 @@ function objetivo(i, k, x, w){
 
 /* ── la retro de una sesión: tres líneas ──────────────────────────────────── */
 function analizar(i, w){
-  var R = { nSer:0, en:0, ton:0, hechos:0, oblig:0, hall:[], bien:[], sube:[], baja:[], sin:[] };
+  var R = { nSer:0, en:0, ton:0, hechos:0, oblig:0, hall:[], bien:[], sube:[], baja:[], sin:[], suave: esSuave(w, i) };
   ejerciciosDe(i, w).forEach(function(x, k){
     var opc = esOpcional(i, k, w), rg = rango(x[1]), s = seriesDe(w, i, k, x[1]), nom = corto(x);
     if(!opc) R.oblig++;
@@ -1090,6 +1107,7 @@ function analizar(i, w){
     R.hechos++; s.forEach(function(z){ R.ton += z.w * z.r; });
     if(!rg) return;
     var rr = s.map(function(z){ return z.r; }), txt = rr.join(",");
+    if(R.suave){ R.nSer += rr.length; R.en += rr.length; return; }
     R.nSer += rr.length; R.en += rr.filter(function(r){ return r >= rg.lo && r <= rg.hi; }).length;
     var def = suma(rr.map(function(r){ return Math.max(0, rg.lo - r); })), ob = objetivo(i, k, x, w), meta = ob.reps.slice(0, rr.length);
     if(rr.length < rg.n && !opc) R.hall.push({ s: 40 * (rg.n - rr.length), t:"<b>" + esc(nom) + "</b>: " + (rg.n - rr.length === 1 ? "faltó una serie" : "faltaron " + (rg.n - rr.length) + " series") + ". Va antes que cualquier opcional." });
@@ -1108,6 +1126,10 @@ function analizar(i, w){
 }
 function lineasRetro(i, w){
   var R = analizar(i, w); if(!R.hechos) return null;
+  if(R.suave){ var Fs = fbSesion(i, w);
+    return { R: R, pct: 100, suave: true, bien: "Viniste aunque no era tu día: " + R.nSer + (R.nSer === 1 ? " serie hecha." : " series hechas.") + " Eso es constancia.",
+      fix: Fs.mol.length ? "<b>Molestia en " + esc(Fs.mol.join(", ")) + "</b>: la próxima vez usa la alternativa o baja un escalón." : "Nada: hoy no se mide.",
+      next: "La próxima sesión vuelves a lo normal, con los pesos de tu última sesión completa.", delta: null }; }
   var pct = R.nSer ? Math.round(R.en / R.nSer * 100) : 0;
   var bien = R.bien.length ? R.bien.slice(0, 1).map(function(b){ return b.t; }).join(" · ") : (pct === 100 ? "Las " + R.nSer + " series dentro del rango." : R.en + " de " + R.nSer + " series dentro del rango.");
   var fix = R.hall.length ? R.hall[0].t : "Nada que corregir hoy.";
@@ -1310,6 +1332,8 @@ function vSesion(){
   h += '<section class="ses-top"><div class="hd-top"><div><p class="lbl">' + DSEM[dowDe(i)] + ' ' + corta(fechaDe(WK, i)) + ' · sem ' + (WK + 1) + ' de ' + NSEM + '</p><h2 class="t-big">' + esc(d.n) + '</h2></div><div class="reloj-s">' + ic("reloj", 16) + '<span id="s-clock" data-ini="' + esc(ini || "") + '" data-fin="' + esc(fin || "") + '">' + (ini ? "" : "0:00") + '</span></div></div>' +
     '<div class="prog"><i style="transform:scaleX(' + (tot ? (hechas / tot).toFixed(3) : 0) + ')"></i></div><div class="ses-stats"><span><b>' + hechas + '</b>/' + tot + ' series</span><span><b>' + miles(vol) + '</b> ' + UNI + ' movidos</span><span><b>' + records().ev.filter(function(e){ return e.sem === WK && e.dia === i; }).length + '</b> récords</span></div>' +
     '<div class="mchips">' + mus.map(function(m){ return '<span>' + esc(m.m) + ' <b>' + m.s + '</b></span>'; }).join("") + '</div></section>';
+  if(esSuave(WK, i)) h += '<div class="aviso suave-on"><b>Versión suave activa.</b> Mismo peso, una serie menos y paras con 3 en el tanque. No cuenta para subir ni bajar.' + (fin ? '' : ' <button type="button" class="btn" data-suave="' + p + 'suave" style="display:flex;margin-top:8px">Volver a la normal</button>') + '</div>';
+  else if(!fin && !esDeload(WK)) h += '<button type="button" class="suave-btn" data-suave="' + p + 'suave">' + ic("luna", 16) + ' ¿Hoy no vienes al 100? <b>Versión suave</b></button>';
   if(!fin) h += '<button type="button" class="btn go wide gym-btn" data-gym>' + ic("rayo", 20) + ' Modo gym · un ejercicio a la vez</button>';
   if(fin) h += retroHTML(i, false);
   if(d.cal) h += '<details class="card" style="padding:0 14px;margin-bottom:10px;border-top:1px solid var(--line)"><summary>Calentamiento</summary><div class="body"><p>' + limpia(d.cal) + '</p></div></details>';
@@ -1688,7 +1712,7 @@ function nInforme(){
   return '<button type="button" class="btn go wide" data-semdet="' + INF_W + '" style="margin-bottom:10px">Ver ejercicio por ejercicio</button><div class="card informe"><div class="hd"><button type="button" class="icbtn" data-infw="-1" aria-label="Semana anterior">‹</button><div style="text-align:center"><h2>Semana ' + (INF_W + 1) + '</h2><span class="tiny">' + fechaSem(INF_W) + '</span></div><button type="button" class="icbtn" data-infw="1" aria-label="Semana siguiente">›</button></div><dl style="margin-top:12px">' + filas.map(function(f){ return '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>'; }).join("") + '</dl><div class="row" style="margin-top:14px"><button type="button" class="btn go" data-historias="' + INF_W + '">▶ Ver en historias</button><button type="button" class="btn" data-copiar="semana">Copiar para mandar</button><span class="tiny" data-copiado></span></div><textarea class="out" readonly aria-label="Informe para copiar"></textarea></div>';
 }
 function textoSesion(i, w){
-  var L = ["SESIÓN · " + DSEM[dowDe(i)] + " " + corta(fechaDe(w, i)) + " · semana " + (w + 1) + " · " + DIAS[i].n];
+  var L = ["SESIÓN · " + DSEM[dowDe(i)] + " " + corta(fechaDe(w, i)) + " · semana " + (w + 1) + " · " + DIAS[i].n + (esSuave(w, i) ? " · VERSIÓN SUAVE (no cuenta para progresión)" : "")];
   var sinA = [];
   ejerciciosDe(i, w).forEach(function(x, k){ var s = seriesDe(w, i, k, x[1]); if(!s.length){ sinA.push(corto(x)); return; } var pw = s.every(function(z){ return z.w === s[0].w; }); L.push((k + 1) + ". " + corto(x) + ": " + (pw && s[0].w ? s[0].w + " × " + s.map(function(z){ return z.r; }).join(", ") : s.map(function(z){ return (z.w ? z.w + "×" : "") + z.r; }).join(", "))); });
   if(sinA.length) L.push("Sin anotar: " + sinA.join(", "));
@@ -2551,7 +2575,8 @@ function metasHTML(){
    · Botón «?» junto a cada número: qué es, cómo se calcula y de dónde sale.
    · «Deshacer» al borrar.
    · «¿De dónde sale?»: la trazabilidad de cada dato del programa. */
-var VERSION = "11", NOVEDADES = [
+var VERSION = "12", NOVEDADES = [
+  ["Versión suave", "¿Hoy no vienes al 100? Arriba de tu sesión toca «Versión suave»: mismo peso, una serie menos y paras con 3 en el tanque. Ese día no cuenta para subir ni bajar."],
   ["Recorrido rápido", "Toca el «?» de arriba y la app te enseña cada sección en 30 segundos, señalando cada botón."],
   ["Tu semana en resumen", "Cada semana, tu retro completa: lo que hiciste increíble, qué mejorar y qué toca."],
   ["Hazla tuya", "En Ajustes: color, cómo te digo, tu frase y letra grande."],
@@ -2771,6 +2796,7 @@ document.addEventListener("click", function(e){
   var d = b.dataset;
   if(d.g){ gymAccion(d.g, b); return; }
   if(d.gym !== undefined){ gymAbrir(); return; }
+  if(d.suave){ if(get(d.suave) === "1"){ del(d.suave); toast("Volviste a la sesión normal"); } else { set(d.suave, "1"); toast("Versión suave: hoy cuenta venir"); } return pintar(); }
   if(d.historias !== undefined){ historias(+d.historias); return; }
   if(d.spdia !== undefined){ diaSemp(+d.spdia); return; }
   if(d.salta){ var sx = $(d.salta), sh1 = $("sheet"); if(sx && sh1) sh1.scrollTo({ top: sx.offsetTop - 104, behavior: MOV_SOFT ? "auto" : "smooth" }); return; }
@@ -3020,6 +3046,7 @@ function cmpEj(i, k, x, w){
   var s = seriesDe(w, i, k, x[1]), rg = rango(x[1]), u = ultimaVez(i, k, w);
   var c = { s: s, u: u, rg: rg, est: "sin", pct: null, enR: null, nota: "", def: 0, tope: false };
   if(!s.length) return c;
+  if(esSuave(w, i)){ c.est = "suave"; c.rg = null; c.nota = "Versión suave: no cuenta para subir ni bajar."; return c; }
   var b1 = mejorE1(s), b0 = u ? mejorE1(u.s) : null, r1 = suma(s.map(function(z){ return z.r; })), r0 = u ? suma(u.s.map(function(z){ return z.r; })) : 0;
   if(!u) c.est = "nuevo";
   else if(b1 && b0 && (b1 / b0 > 1.5 || b1 / b0 < .6)) c.est = "cambio"; // un salto así es otro equipo u otra forma de anotar, no progreso
@@ -3037,9 +3064,9 @@ function cmpEj(i, k, x, w){
   }
   return c;
 }
-var EST = { up:["ok","↑ Subió"], eq:["acc","= Igual"], down:["bad","↓ Bajó"], sin:["warn","Sin anotar"], nuevo:["acc","Primera vez"], cambio:["acc","Cambió el equipo"] };
+var EST = { up:["ok","↑ Subió"], eq:["acc","= Igual"], down:["bad","↓ Bajó"], sin:["warn","Sin anotar"], nuevo:["acc","Primera vez"], cambio:["acc","Cambió el equipo"], suave:["acc","Versión suave"] };
 function datosSemana(w){
-  var D = { w: w, T: { up:0, eq:0, down:0, sin:0, nuevo:0, cambio:0 }, hechas: 0, ser: 0, en: 0, top: null, ups: [], bajo: [], tope: [], faltan: [], mol: [], dias: [] };
+  var D = { w: w, T: { up:0, eq:0, down:0, sin:0, nuevo:0, cambio:0, suave:0 }, hechas: 0, ser: 0, en: 0, top: null, ups: [], bajo: [], tope: [], faltan: [], mol: [], dias: [] };
   DIAS.forEach(function(d, i){
     var hecho = sesionHecha(w, i) === 1, rows = [];
     if(hecho) D.hechas++;
