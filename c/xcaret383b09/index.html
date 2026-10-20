@@ -3245,6 +3245,9 @@ function autoResumen(){
     }).catch(function(){});
   }, 1500);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) trae(); });
+  // 20 oct 2026: la app fijada en inicio (iPhone) se queda viva en memoria y no se recarga sola; si estuvo
+  // escondida más de 30 min y no hay nada abierto, se recarga para traer la versión nueva. Lo anotado ya está guardado.
+  var _oculta = 0; document.addEventListener("visibilitychange", function(){ if(document.hidden){ _oculta = Date.now(); return; } if(_oculta && Date.now() - _oculta > 30 * 60000 && !$("gym") && !$("sheet") && !$("tour") && navigator.onLine !== false) location.reload(); });
 })();
 
 /* ── arranque ── */

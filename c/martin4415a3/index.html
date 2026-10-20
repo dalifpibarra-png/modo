@@ -585,6 +585,7 @@ textarea.out{display:none;height:9rem;font:12px/1.4 var(--data)}
 .coach-v[data-tono="retro"] .bub{border-color:var(--acc);border-width:2px;background:linear-gradient(135deg,var(--acc-w),var(--card) 70%)}
 .coach-v[data-tono="retro"] .bub p:last-of-type{font-size:.97rem;line-height:1.55}
 .coach-v[data-tono="cuida"] .bub{border-color:var(--plate15);background:linear-gradient(135deg,var(--warn-w),var(--card) 70%)}
+.coach-v .bub p.cari{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:.92rem;line-height:1.45;font-style:italic;color:var(--acc)}
 .coach-v[data-tono="empuja"] .bub{border-color:var(--acc);background:linear-gradient(135deg,var(--acc-w),var(--card) 70%)}
 /* misión */
 .mis-anillo{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;margin-bottom:8px}
@@ -2525,8 +2526,10 @@ function coachHTML(){
   var foto = CFG.coachFoto, rs = retroPendiente();
   if(rs){ var p1 = String(rs.t).split(/\n+/).filter(function(x){ return x.trim(); })[0] || "";
     return '<section class="coach-v" data-tono="retro" id="retro-sem"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu retro ' + (rs.sem ? 'de la semana ' + rs.sem : 'de la semana') + ' · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + esc(p1) + '</p><div class="retro-acc"><button type="button" class="btn go" data-semdet="' + ((+rs.sem || SEM_HOY + 1) - 1) + '">Leer mi retro completa</button><button type="button" class="btn ghost sm" data-leida="' + esc(rs.f) + '">Ya la leí</button></div></div></section>'; }
-  var m = mensajeCoach();
-  return '<section class="coach-v" data-tono="' + m.tono + '"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu coach · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + m.t + '</p></div></section>';
+  var m = mensajeCoach(), ca = CFG.carino, cari = "";
+  // ficha con `carino`: un mensaje distinto cada día, el mismo todo el día
+  if(ca && ca.length) cari = '<p class="cari">' + esc(ca[Math.floor(Date.UTC(HOY.getFullYear(), HOY.getMonth(), HOY.getDate()) / 864e5) % ca.length]) + '</p>';
+  return '<section class="coach-v" data-tono="' + m.tono + '"><span class="av">' + (foto ? '<img src="' + foto + '" alt="Dalí, tu coach" width="52" height="52">' : '<b>D</b>') + '<i></i></span><div class="bub"><p class="lbl">Tu coach · ' + esc(CFG.coachNombre || "Dalí") + '</p><p>' + m.t + '</p>' + cari + '</div></section>';
 }
 
 /* ── misión de la semana ── */
@@ -3242,6 +3245,9 @@ function autoResumen(){
     }).catch(function(){});
   }, 1500);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) trae(); });
+  // 20 oct 2026: la app fijada en inicio (iPhone) se queda viva en memoria y no se recarga sola; si estuvo
+  // escondida más de 30 min y no hay nada abierto, se recarga para traer la versión nueva. Lo anotado ya está guardado.
+  var _oculta = 0; document.addEventListener("visibilitychange", function(){ if(document.hidden){ _oculta = Date.now(); return; } if(_oculta && Date.now() - _oculta > 30 * 60000 && !$("gym") && !$("sheet") && !$("tour") && navigator.onLine !== false) location.reload(); });
 })();
 
 /* ── arranque ── */
