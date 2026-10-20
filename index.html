@@ -86,16 +86,28 @@ section{padding-block:clamp(64px,10vw,120px)}
 .barra-hero svg{width:100%;height:100%;overflow:visible}
 @media(max-width:820px){
   .hero .in{grid-template-columns:minmax(0,1fr)}
-  .escena{min-height:0;order:-1;margin-bottom:22px;padding-bottom:18px}
-  .telefono{width:min(140px,38vw);border-radius:26px;padding:6px}
-  .telefono img{border-radius:21px}
+  .escena{min-height:0;order:-1;margin-bottom:14px;padding-bottom:16px}
+  .telefono{width:min(112px,30vw);border-radius:22px;padding:5px}
+  .telefono img{border-radius:18px;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px)}
   .barra-hero{top:48%;height:80px}
   .hero{padding-block:20px 40px}
   .hero p{margin-top:14px}
-  .hero .ctas{margin-top:20px}
+  .hero .ctas{margin-top:18px}
+  .hero .ctas{flex-wrap:nowrap;gap:10px}.hero .ctas .btn{flex:1 1 0;padding-inline:10px;font-size:.92rem;white-space:nowrap}
+  .hero h1{font-size:clamp(2.6rem,11vw,3.4rem)}
   .hero p{max-width:none}
 }
 
+/* ── franja de datos y aviso (como Kauri: lo que importa, en números, en la primera pantalla) ── */
+.datos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:26px;border-top:1px solid rgba(255,255,255,.12);max-width:560px}
+.datos div{padding:12px 6px 0;text-align:center;border-left:1px solid rgba(255,255,255,.12)}
+.datos div:first-child{border-left:0;padding-left:0;text-align:left}
+.datos b{display:block;font:850 clamp(1.25rem,4.6vw,1.6rem)/1 var(--display);color:var(--on-floor)}
+.datos b.ok{color:var(--p15)}
+.datos span{display:block;margin-top:6px;font-size:.72rem;line-height:1.25;color:var(--on-floor2);text-transform:uppercase;letter-spacing:.04em}
+.aviso{display:flex;justify-content:center;align-items:center;gap:6px 14px;flex-wrap:wrap;background:var(--p15);color:#1a1300;padding:12px 16px;text-align:center;font-size:.95rem;text-decoration:none}
+.aviso b{font:800 .78rem var(--display);letter-spacing:.08em;text-transform:uppercase}
+.aviso u{font-weight:700;text-underline-offset:3px}
 /* ── frases de capítulo ── */
 .frase{padding-block:clamp(56px,9vw,110px)}
 .frase p{font:850 clamp(2.1rem,7vw,5rem)/1.02 var(--display);font-stretch:114%;letter-spacing:-.03em;max-width:16ch}
@@ -349,8 +361,9 @@ section{padding-block:clamp(48px,8vw,96px)}
   <div class="in">
     <div class="txt">
       <h1 class="h-in">Por fin vas a <em>ver</em> tu progreso.</h1>
-      <p class="h-in">Programa a tu nivel, una app que te dice qué levantar cada día y un coach que revisa tu semana.</p>
+      <p class="h-in">Tu programa, una app que te dice qué levantar y yo revisando tu semana.</p>
       <div class="ctas h-in"><a class="btn go" href="#app">Ver cómo funciona</a><a class="btn line" href="#nivel">¿Qué nivel soy?</a></div>
+      <div class="datos h-in"><div><b class="ok">+22 %</b><span>fuerza en 8 semanas</span></div><div><b>3</b><span>niveles</span></div><div><b>Vie</b><span>reviso tu semana</span></div><div><b>100 %</b><span>a distancia</span></div></div>
     </div>
     <div class="escena" aria-hidden="true">
       <div class="telefono" id="demo-tel"><img class="on" src="img/hoy.jpg" alt="" width="560" height="1211"><img src="img/gym.jpg" alt="" width="560" height="1211"><img src="img/ent.jpg" alt="" width="560" height="1211"><img src="img/retro.jpg" alt="" width="560" height="1211"><img src="img/av.jpg" alt="" width="560" height="1211"><img src="img/const.jpg" alt="" width="560" height="1211"><img src="img/com.jpg" alt="" width="560" height="1211"></div>
@@ -359,6 +372,7 @@ section{padding-block:clamp(48px,8vw,96px)}
     </div>
   </div>
 </header>
+<a class="aviso" href="#niveles"><b>Precio fundador</b><span>Los primeros 5 pagan 25 % menos</span><u>Ver precios →</u></a>
 
 <p class="cap">Capítulo 1 · El problema</p>
 <section id="problema" data-chapter="El problema">
@@ -387,8 +401,7 @@ section{padding-block:clamp(48px,8vw,96px)}
   <div class="in regalo">
     <div>
       <h2 class="h2">La regla que te da fuerza gratis</h2>
-      <p class="lead" style="margin-top:14px">Se llama doble progresión. Primero subes repeticiones dentro de un rango; cuando todas tus series tocan el tope, subes el peso. Pon tu última sesión de cualquier ejercicio y te digo qué hacer la próxima.</p>
-      <p class="lead" style="margin-top:12px">Es lo mismo que calcula la app después de cada sesión, ejercicio por ejercicio.</p>
+      <p class="lead" style="margin-top:14px">Doble progresión: subes repeticiones y, cuando todas tus series tocan el tope, subes el peso. Pon tu última sesión y te digo qué toca.</p>
     </div>
     <div class="calc">
       <div><p class="lbl">Tu rango de repeticiones</p><div class="rangos" id="rangos"><button type="button" data-r="6-10" aria-pressed="false">6 a 10</button><button type="button" data-r="8-12" aria-pressed="true">8 a 12</button><button type="button" data-r="10-15" aria-pressed="false">10 a 15</button><button type="button" data-r="12-20" aria-pressed="false">12 a 20</button></div></div>
@@ -401,7 +414,7 @@ section{padding-block:clamp(48px,8vw,96px)}
 <p class="cap">Capítulo 3 · La app</p>
 <section id="app" data-chapter="La app" style="padding-top:0">
   <div class="in">
-    <div class="app-head"><div><h2 class="h2">Tu entrenador, en el bolsillo</h2><p class="lead" style="margin-top:14px">Así se ve por dentro. Son pantallas reales de un demo con datos de ejemplo.</p></div><span class="desliza">Desliza →</span></div>
+    <div class="app-head"><div><h2 class="h2">Tu entrenador, en el bolsillo</h2><p class="lead" style="margin-top:14px">Pantallas reales de un demo.</p></div><span class="desliza">Desliza →</span></div>
     <div class="carril" id="carril">
       <figure><div class="pant"><img src="img/gym.jpg" alt="Modo gym: un ejercicio a la vez, botones de más y menos y la serie se marca con un toque" loading="lazy" width="560" height="1211"></div><figcaption><b>Modo gym</b><span>Un ejercicio a la vez, sin teclado. Marcas la serie con un toque y el descanso arranca solo.</span></figcaption></figure>
       <figure><div class="pant"><img src="img/hoy.jpg" alt="Pantalla Hoy: la barra con los cinco hábitos del día y el check-in" loading="lazy" width="560" height="1211"></div><figcaption><b>Tu día en una barra</b><span>Entreno, comida, sueño, pasos y agua. Cada hábito es un disco.</span></figcaption></figure>
@@ -411,7 +424,6 @@ section{padding-block:clamp(48px,8vw,96px)}
       <figure><div class="pant"><img src="img/com.jpg" alt="Comida: el plato y los tiempos del día con palomita" loading="lazy" width="560" height="1211"></div><figcaption><b>Comer para entrenar</b><span>Una guía práctica con tu plato y tus tiempos. Sin dietas raras.</span></figcaption></figure>
       <figure><div class="pant"><img src="img/const.jpg" alt="Logros: medallas por sesiones, récords, racha, sueño y agua" loading="lazy" width="560" height="1211"></div><figcaption><b>Logros y racha</b><span>Medallas por constancia, récords, sueño y agua. Tu racha de días, siempre a la vista.</span></figcaption></figure>
     </div>
-    <details class="mas"><summary>Ver todo lo que incluye</summary><div class="bento"><article class="bt big" style="--c:var(--p20)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M3.5 9v6M17.5 6.5v11M20.5 9v6M6.5 12h11"/></svg></span><h3>Modo gym</h3><p>Un ejercicio a la vez, sin teclado. Marcas la serie y el descanso arranca solo.</p></article><article class="bt" style="--c:var(--p25)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span><h3>Tu retro al terminar</h3><p>Lo que salió bien, qué corregir y qué hacer la próxima vez.</p></article><article class="bt" style="--c:var(--p15)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg></span><h3>Récords automáticos</h3><p>La app detecta cada vez que superas tu mejor marca y lo festeja.</p></article><article class="bt" style="--c:var(--p10)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></svg></span><h3>Plan a tu nivel</h3><p>Fases del bloque, metas con barra y alternativas por ejercicio.</p></article><article class="bt" style="--c:var(--p20)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg></span><h3>Comida sin complicarte</h3><p>Tu plato, porciones con la mano, recetas y lista del súper.</p></article><article class="bt" style="--c:var(--p25)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.8 3.6 5 5.2 5 10a5 5 0 0 1-10 0c0-2.8 1.8-4 2.2-6 1.6 1 2.6 2.8 2.6 2.8S13 6.8 12 3z"/></svg></span><h3>Misión y racha</h3><p>Cinco hábitos por semana y tu racha de días a la vista.</p></article><article class="bt" style="--c:var(--p15)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M6 16v-4M11 16V7M16 16v-6M20 16V4"/></svg></span><h3>Tus avances</h3><p>Fuerza, cuerpo, constancia y tu semana en historias.</p></article><article class="bt" style="--c:var(--p10)"><span class="bt-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg></span><h3>Aprende el porqué</h3><p>Mini clases con fuente: RPE, descanso, proteína, sueño.</p></article></div></details>
   </div>
 </section>
 
@@ -419,7 +431,7 @@ section{padding-block:clamp(48px,8vw,96px)}
 <section class="prueba" id="prueba" data-chapter="Prueba">
   <div class="in">
     <h2 class="h2">Mis números, 8 semanas</h2>
-    <p class="lead" style="margin-top:14px">Antes de vendértelo lo probé en mí. Este es mi Bloque 2, registrado serie por serie en la misma app que vas a usar.</p>
+    <p class="lead" style="margin-top:14px">Antes de vendértelo, lo probé en mí, en la misma app que vas a usar.</p>
     <div class="lifts" id="lifts">
       <div class="lift"><span class="n">Hack squat<small>210 → 250 lb</small></span><div class="tr"><span class="a" style="width:84%"></span><span class="b" style="width:100%;background:var(--p25)"></span></div><span class="pct">+19 %</span></div>
       <div class="lift"><span class="n">Peso muerto rumano<small>185 → 225 lb</small></span><div class="tr"><span class="a" style="width:82%"></span><span class="b" style="width:100%;background:var(--p20)"></span></div><span class="pct">+22 %</span></div>
@@ -444,9 +456,9 @@ section{padding-block:clamp(48px,8vw,96px)}
     </aside>
     <div class="txt">
       <h2 class="h2" style="margin-bottom:18px">Quién te acompaña</h2>
-      <p>Soy Dalí. Llevo años entrenando y durante mucho tiempo hice lo mismo que tú: rutinas sueltas, pesos al tanteo y resultados que no llegaban. Lo que cambió todo fue <b>medir</b>: anotar cada serie, saber cuándo subir y revisar la semana con números.</p>
-      <p>El Método Dalí nació de eso. La app la uso yo todos los días y la armo para ti con tu nivel, tus días y tus gustos. No te acompaño en persona; por eso cada ejercicio trae video y alternativas, y cada semana reviso tu avance.</p>
-      <p class="no-soy"><b>No soy nutriólogo.</b> Te doy una guía práctica para comer bien y entrenar mejor. Si quieres un plan con calorías y gramos, te conecto con una nutrióloga con cédula y lo integro a tu app.</p>
+      <p>Soy Dalí. Durante años entrené con rutinas sueltas y pesos al tanteo. Lo que cambió todo fue <b>medir</b>: anotar cada serie y saber cuándo subir.</p>
+      <p>Uso la app todos los días y la armo para ti con tu nivel, tus días y tu gym. Cada viernes reviso tu semana.</p>
+      <p class="no-soy"><b>No soy nutriólogo.</b> Te doy una guía práctica; si quieres un plan con gramos, te conecto con una nutrióloga con cédula.</p>
     </div>
   </div>
 </section>
@@ -457,7 +469,7 @@ section{padding-block:clamp(48px,8vw,96px)}
 <section id="nivel" data-chapter="Tu nivel" style="padding-top:0">
   <div class="in">
     <h2 class="h2">¿Qué nivel soy?</h2>
-    <p class="lead" style="margin-top:14px">Cuatro preguntas. Al final te digo tu nivel y, si quieres, me lo mandas por WhatsApp con tus respuestas.</p>
+    <p class="lead" style="margin-top:14px">Cuatro preguntas y te digo tu nivel.</p>
     <div class="quiz" id="quiz"></div>
   </div>
 </section>
@@ -465,7 +477,7 @@ section{padding-block:clamp(48px,8vw,96px)}
 <section id="tuplan" data-chapter="Tu plan" style="padding-top:0">
   <div class="in">
     <h2 class="h2">Así sería tu plan</h2>
-    <p class="lead" style="margin-top:14px" id="tp-lead">Este es el programa base de cada nivel, tal como lo verías en tu app. Al arrancar lo ajusto a tus días, tu gym y lo que te guste.</p>
+    <p class="lead" style="margin-top:14px" id="tp-lead">El programa base de cada nivel. Al arrancar lo ajusto a tus días y tu gym.</p>
     <div class="tp-niv" id="tp-niv" role="tablist"></div>
     <div class="tp" id="tp"></div>
   </div>
@@ -475,7 +487,7 @@ section{padding-block:clamp(48px,8vw,96px)}
 <section id="niveles" data-chapter="Niveles" style="padding-top:0">
   <div class="in">
     <h2 class="h2">Elige cómo te acompaño</h2>
-    <p class="lead" style="margin-top:14px">Tu nivel define tu programa; el plan define cuánto te acompaño. Cualquier nivel entra en cualquier plan, y cambias de plan cuando quieras.</p>
+    <p class="lead" style="margin-top:14px">Tu nivel define el programa; el plan, cuánto te acompaño. Cambias cuando quieras.</p>
     <details class="mas"><summary>¿Es para ti? Revísalo en 10 segundos</summary><div class="vs">
       <div class="vs-c si"><p class="vs-k">Es para ti si</p><ul><li>Ya vas al gym, o quieres empezar con un plan claro</li><li>Quieres ver tu avance con números, no solo en el espejo</li><li>Te late anotar tus series y seguir un programa</li><li>Puedes entrenar de 3 a 5 días por semana</li></ul></div>
       <div class="vs-c no"><p class="vs-k">No es para ti si</p><ul><li>Buscas resultados en dos semanas</li><li>Quieres un entrenador a tu lado en el gym</li><li>Necesitas una dieta para una enfermedad (ahí va un profesional con cédula)</li><li>No vas a anotar nada: sin registro no hay ajustes</li></ul></div>
@@ -491,9 +503,9 @@ section{padding-block:clamp(48px,8vw,96px)}
   <div class="in">
     <h2 class="h2">Tres pasos y arrancas</h2>
     <ol class="pasos"><span class="riel" aria-hidden="true"><i id="riel"></i></span>
-      <li><span class="num" style="background:var(--p25)">1</span><h3>Me escribes</h3><p>Contestas 4 preguntas: cuánto llevas entrenando, cuántos días puedes, qué quieres cambiar y si algo te duele.</p></li>
-      <li><span class="num" style="background:var(--p20)">2</span><h3>Pruebas tu nivel</h3><p>Te digo qué nivel te toca y te mando el demo para que toques la app antes de pagar un peso.</p></li>
-      <li><span class="num" style="background:var(--p10)">3</span><h3>Tu panel en 48 horas</h3><p>Con tus días reales, tu gym y tus gustos. Cada viernes reviso tu semana y ajusto lo que toca.</p></li>
+      <li><span class="num" style="background:var(--p25)">1</span><h3>Me escribes</h3><p>Cuatro preguntas: tiempo entrenando, días, meta y si algo te duele.</p></li>
+      <li><span class="num" style="background:var(--p20)">2</span><h3>Pruebas tu nivel</h3><p>Te mando el demo para que toques la app antes de pagar un peso.</p></li>
+      <li><span class="num" style="background:var(--p10)">3</span><h3>Tu panel en 48 horas</h3><p>Con tus días y tu gym. Cada viernes reviso tu semana.</p></li>
     </ol>
   </div>
 </section>
@@ -503,7 +515,6 @@ section{padding-block:clamp(48px,8vw,96px)}
     <h2 class="h2">Lo que más me preguntan</h2>
     <div class="faq">
       <details><summary>¿Necesito un gym?</summary><p>Sí, los programas están hechos para gym con máquinas, poleas y mancuernas. Si a tu gym le falta algo, cada ejercicio trae alternativas y lo ajustamos en tu panel.</p></details>
-      <details><summary>¿Es presencial?</summary><p>No. Todo es a distancia: tu app, tus videos de técnica y mi revisión cada viernes. Por eso cada ejercicio trae video, clave técnica y alternativas.</p></details>
       <details><summary>¿Y la comida?</summary><p>Te doy una guía práctica: proteína en cada comida, la mitad del plato verdura y porciones con tu mano. Si quieres un plan con calorías y gramos, te conecto con una nutrióloga con cédula.</p></details>
       <details><summary>¿Qué pasa si algo me duele?</summary><p>Lo marcas en la app y me escribes ese mismo día. Antes de arrancar contestas un cuestionario de salud: si algo sale en rojo, primero pasas con tu médico.</p></details>
       <details><summary>¿Cuánto tiempo necesito?</summary><p>De 3 a 5 días de 60 minutos, según tu nivel. Lo opcional va marcado para que lo hagas solo si te sobra tiempo.</p></details>
